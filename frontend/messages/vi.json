@@ -3,17 +3,17 @@
     "name": "AI Crawling"
   },
   "navigation": {
-    "dashboard": "Trang chủ",
-    "tab2": "Tab 2",
-    "tab3": "Tab 3",
+    "mainStream": "Luồng chính",
+    "neuralFeed": "Tin tức AI",
+    "flashAlerts": "Cảnh báo nhanh",
+    "research": "Nghiên cứu",
     "settings": "Cài đặt",
     "getHelp": "Trợ giúp",
-    "dataLibrary": "Thư viện dữ liệu",
-    "quickCreate": "Tạo nhanh",
-    "inbox": "Hộp thư"
+    "savedIntel": "Tin đã lưu",
+    "computeTrends": "Xu hướng công nghệ"
   },
   "documents": {
-    "title": "Tài liệu",
+    "title": "Bộ sưu tập",
     "more": "Xem thêm",
     "open": "Mở",
     "share": "Chia sẻ",
@@ -26,7 +26,26 @@
     "logout": "Đăng xuất"
   },
   "header": {
-    "documents": "Tài liệu"
+    "documents": "Tài liệu",
+    "searchPlaceholder": "Tìm kiếm thông tin, thực thể hoặc hashtag...",
+    "searchPages": "Trang",
+    "searchNoResults": "Không tìm thấy kết quả.",
+    "searchGoToPage": "Đi đến trang"
+  },
+  "neuralFeed": {
+    "title": "Tổng hợp thông tin",
+    "activeMonitoring": "Đang theo dõi",
+    "streamConfiguration": "Cấu hình luồng",
+    "resetFilters": "Đặt lại bộ lọc",
+    "sources": "Nguồn",
+    "sourceAll": "Tất cả",
+    "sourceNews": "Tin tức",
+    "sourceSocial": "Mạng xã hội",
+    "filterByCompany": "Lọc theo công ty",
+    "intelligenceBrief": "Tóm tắt thông tin",
+    "keyTakeaways": "Điểm chính",
+    "tags": "Thẻ",
+    "addToWorkspace": "Thêm vào workspace"
   },
   "locale": {
     "switchLanguage": "Chuyển ngôn ngữ",

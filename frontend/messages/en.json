@@ -3,17 +3,17 @@
     "name": "AI Crawling"
   },
   "navigation": {
-    "dashboard": "Dashboard",
-    "tab2": "Tab 2",
-    "tab3": "Tab 3",
+    "mainStream": "Main Stream",
+    "neuralFeed": "Neural Feed",
+    "flashAlerts": "Flash Alerts",
+    "research": "Research",
     "settings": "Settings",
     "getHelp": "Get Help",
-    "dataLibrary": "Data Library",
-    "quickCreate": "Quick Create",
-    "inbox": "Inbox"
+    "savedIntel": "Saved Intel",
+    "computeTrends": "Compute Trends"
   },
   "documents": {
-    "title": "Documents",
+    "title": "Collections",
     "more": "More",
     "open": "Open",
     "share": "Share",
@@ -26,7 +26,26 @@
     "logout": "Log out"
   },
   "header": {
-    "documents": "Documents"
+    "documents": "Documents",
+    "searchPlaceholder": "Search intelligence, entities, or hashtags...",
+    "searchPages": "Pages",
+    "searchNoResults": "No results found.",
+    "searchGoToPage": "Go to Page"
+  },
+  "neuralFeed": {
+    "title": "Intelligence Aggregator",
+    "activeMonitoring": "Active Monitoring",
+    "streamConfiguration": "Stream Configuration",
+    "resetFilters": "Reset Filters",
+    "sources": "Sources",
+    "sourceAll": "All",
+    "sourceNews": "News",
+    "sourceSocial": "Social",
+    "filterByCompany": "Filter by Company",
+    "intelligenceBrief": "Intelligence Brief",
+    "keyTakeaways": "Key Takeaways",
+    "tags": "Tags",
+    "addToWorkspace": "Add to Workspace"
   },
   "locale": {
     "switchLanguage": "Switch language",

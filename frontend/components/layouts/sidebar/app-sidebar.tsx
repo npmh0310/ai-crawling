@@ -17,12 +17,14 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import {
+  BookmarkIcon,
+  BookOpenIcon,
   CircleHelpIcon,
   CommandIcon,
+  CpuIcon,
   LayoutDashboardIcon,
-  LayoutListIcon,
   Settings2Icon,
-  Table2Icon,
+  ZapIcon,
 } from "lucide-react"
 
 const user = {
@@ -37,19 +39,19 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   const navMain = [
     {
-      title: t("dashboard"),
+      title: t("neuralFeed"),
       url: "/",
       icon: <LayoutDashboardIcon />,
     },
     {
-      title: t("tab2"),
-      url: "/tab2",
-      icon: <LayoutListIcon />,
+      title: t("flashAlerts"),
+      url: "/flash-alerts",
+      icon: <ZapIcon />,
     },
     {
-      title: t("tab3"),
-      url: "/tab3",
-      icon: <Table2Icon />,
+      title: t("research"),
+      url: "/research",
+      icon: <BookOpenIcon />,
     },
   ]
 
@@ -68,19 +70,24 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   const documents = [
     {
-      name: t("dataLibrary"),
+      name: t("savedIntel"),
       url: "#",
-      icon: <CommandIcon />,
+      icon: <BookmarkIcon />,
+    },
+    {
+      name: t("computeTrends"),
+      url: "#",
+      icon: <CpuIcon />,
     },
   ]
 
   return (
     <Sidebar collapsible="offcanvas" {...props}>
-      <SidebarHeader>
+      <SidebarHeader className="h-(--header-height)">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
-              className="data-[slot=sidebar-menu-button]:p-1.5!"
+              className="data-[slot=sidebar-menu-button]:p-1.5! h-(--header-height)"
               render={<a href="#" />}
             >
               <CommandIcon className="size-5!" />
@@ -90,7 +97,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={navMain} />
+        <NavMain items={navMain} label={t("mainStream")} />
         <NavDocuments items={documents} />
         <NavSecondary items={navSecondary} className="mt-auto" />
       </SidebarContent>

@@ -1,7 +1,7 @@
 "use client"
 
 import { useTransition } from "react"
-import { useLocale, useTranslations } from "next-intl"
+import { useLocale } from "next-intl"
 import { useRouter } from "next/navigation"
 import { GlobeIcon } from "lucide-react"
 
@@ -15,19 +15,18 @@ import {
 } from "@/components/ui/dropdown-menu"
 
 const locales = [
-  { value: "en", labelKey: "en" },
-  { value: "vi", labelKey: "vi" },
+  { value: "vi", label: "VN" },
+  { value: "en", label: "EN" },
 ] as const
 
-export function LocaleToggle() {
-  const t = useTranslations("locale")
+export function LocaleToggleButton() {
   const locale = useLocale()
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
 
-  function handleSelect(nextLocale: string) {
+  function handleSelect(next: string) {
     startTransition(async () => {
-      await setLocale(nextLocale)
+      await setLocale(next)
       router.refresh()
     })
   }
@@ -36,12 +35,7 @@ export function LocaleToggle() {
     <DropdownMenu>
       <DropdownMenuTrigger
         render={
-          <Button
-            variant="ghost"
-            size="icon"
-            disabled={isPending}
-            aria-label={t("switchLanguage")}
-          />
+          <Button variant="ghost" size="icon" disabled={isPending} />
         }
       >
         <GlobeIcon className="size-4" />
@@ -53,7 +47,7 @@ export function LocaleToggle() {
             onClick={() => handleSelect(l.value)}
             className={locale === l.value ? "font-semibold" : ""}
           >
-            {t(l.labelKey)}
+            {l.label}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>
