@@ -1,0 +1,36 @@
+{
+  "app": {
+    "name": "AI Crawling"
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "tab2": "Tab 2",
+    "tab3": "Tab 3",
+    "settings": "Settings",
+    "getHelp": "Get Help",
+    "dataLibrary": "Data Library",
+    "quickCreate": "Quick Create",
+    "inbox": "Inbox"
+  },
+  "documents": {
+    "title": "Documents",
+    "more": "More",
+    "open": "Open",
+    "share": "Share",
+    "delete": "Delete"
+  },
+  "user": {
+    "account": "Account",
+    "billing": "Billing",
+    "notifications": "Notifications",
+    "logout": "Log out"
+  },
+  "header": {
+    "documents": "Documents"
+  },
+  "locale": {
+    "switchLanguage": "Switch language",
+    "en": "English",
+    "vi": "Vietnamese"
+  }
+}

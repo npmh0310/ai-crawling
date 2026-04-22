@@ -1,0 +1,36 @@
+{
+  "app": {
+    "name": "AI Crawling"
+  },
+  "navigation": {
+    "dashboard": "Trang chủ",
+    "tab2": "Tab 2",
+    "tab3": "Tab 3",
+    "settings": "Cài đặt",
+    "getHelp": "Trợ giúp",
+    "dataLibrary": "Thư viện dữ liệu",
+    "quickCreate": "Tạo nhanh",
+    "inbox": "Hộp thư"
+  },
+  "documents": {
+    "title": "Tài liệu",
+    "more": "Xem thêm",
+    "open": "Mở",
+    "share": "Chia sẻ",
+    "delete": "Xóa"
+  },
+  "user": {
+    "account": "Tài khoản",
+    "billing": "Thanh toán",
+    "notifications": "Thông báo",
+    "logout": "Đăng xuất"
+  },
+  "header": {
+    "documents": "Tài liệu"
+  },
+  "locale": {
+    "switchLanguage": "Chuyển ngôn ngữ",
+    "en": "Tiếng Anh",
+    "vi": "Tiếng Việt"
+  }
+}
