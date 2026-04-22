@@ -3,6 +3,8 @@ import { Inter, Roboto } from "next/font/google"
 import { NextIntlClientProvider } from "next-intl"
 import { getLocale, getMessages } from "next-intl/server"
 
+import { ThemeProvider } from "@/components/providers/theme-provider"
+
 import "./globals.css"
 
 const inter = Inter({
@@ -33,10 +35,18 @@ export default async function RootLayout({
     <html
       lang={locale}
       className={`${inter.variable} ${roboto.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-full flex flex-col bg-background text-foreground">
         <NextIntlClientProvider locale={locale} messages={messages}>
-          {children}
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            {children}
+          </ThemeProvider>
         </NextIntlClientProvider>
       </body>
     </html>
