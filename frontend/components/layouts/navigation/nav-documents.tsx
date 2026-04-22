@@ -1,5 +1,7 @@
 "use client"
 
+import { useTranslations } from "next-intl"
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,10 +29,12 @@ export function NavDocuments({
     icon: React.ReactNode
   }[]
 }) {
+  const t = useTranslations("documents")
   const { isMobile } = useSidebar()
+
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-      <SidebarGroupLabel>Documents</SidebarGroupLabel>
+      <SidebarGroupLabel>{t("title")}</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => (
           <SidebarMenuItem key={item.name}>
@@ -47,9 +51,8 @@ export function NavDocuments({
                   />
                 }
               >
-                <MoreHorizontalIcon
-                />
-                <span className="sr-only">More</span>
+                <MoreHorizontalIcon />
+                <span className="sr-only">{t("more")}</span>
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 className="w-24"
@@ -57,20 +60,17 @@ export function NavDocuments({
                 align={isMobile ? "end" : "start"}
               >
                 <DropdownMenuItem>
-                  <FolderIcon
-                  />
-                  <span>Open</span>
+                  <FolderIcon />
+                  <span>{t("open")}</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <ShareIcon
-                  />
-                  <span>Share</span>
+                  <ShareIcon />
+                  <span>{t("share")}</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem variant="destructive">
-                  <Trash2Icon
-                  />
-                  <span>Delete</span>
+                  <Trash2Icon />
+                  <span>{t("delete")}</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -79,7 +79,7 @@ export function NavDocuments({
         <SidebarMenuItem>
           <SidebarMenuButton className="text-sidebar-foreground/70">
             <MoreHorizontalIcon className="text-sidebar-foreground/70" />
-            <span>More</span>
+            <span>{t("more")}</span>
           </SidebarMenuButton>
         </SidebarMenuItem>
       </SidebarMenu>

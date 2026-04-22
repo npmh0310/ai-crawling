@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import Link from "next/link"
 
 import { Button } from "@/components/ui/button"
@@ -21,17 +22,19 @@ export function NavMain({
     icon?: React.ReactNode
   }[]
 }) {
+  const t = useTranslations("navigation")
+
   return (
     <SidebarGroup>
       <SidebarGroupContent className="flex flex-col gap-2">
         <SidebarMenu>
           <SidebarMenuItem className="flex items-center gap-2">
             <SidebarMenuButton
-              tooltip="Quick Create"
+              tooltip={t("quickCreate")}
               className="min-w-8 bg-primary text-primary-foreground duration-200 ease-linear hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground"
             >
               <CirclePlusIcon />
-              <span>Quick Create</span>
+              <span>{t("quickCreate")}</span>
             </SidebarMenuButton>
             <Button
               size="icon"
@@ -39,7 +42,7 @@ export function NavMain({
               variant="outline"
             >
               <MailIcon />
-              <span className="sr-only">Inbox</span>
+              <span className="sr-only">{t("inbox")}</span>
             </Button>
           </SidebarMenuItem>
         </SidebarMenu>
