@@ -1,0 +1,77 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model FeedSource {
+  id        String     @id @default(uuid())
+  company   Company
+  name      String
+  rssUrl    String     @map("rss_url")
+  isActive  Boolean    @default(true) @map("is_active")
+  createdAt DateTime   @default(now()) @map("created_at")
+  crawlLogs CrawlLog[]
+  feedItems FeedItem[]
+
+  @@map("feed_sources")
+}
+
+model FeedItem {
+  id          String     @id @default(uuid())
+  sourceId    String     @map("source_id")
+  company     Company
+  sourceType  SourceType @map("source_type")
+  category    String     @default("general")
+  title       String
+  body        String?
+  quote       String?
+  handle      String?
+  takeaways   String[]
+  tags        String[]
+  originalUrl String?    @map("original_url")
+  publishedAt DateTime   @map("published_at")
+  isRead      Boolean    @default(false) @map("is_read")
+  guid        String     @unique
+  createdAt   DateTime   @default(now()) @map("created_at")
+  source      FeedSource @relation(fields: [sourceId], references: [id])
+
+  @@map("feed_items")
+}
+
+model CrawlLog {
+  id         String      @id @default(uuid())
+  sourceId   String      @map("source_id")
+  status     CrawlStatus
+  itemsFound Int         @default(0) @map("items_found")
+  itemsNew   Int         @default(0) @map("items_new")
+  startedAt  DateTime    @map("started_at")
+  finishedAt DateTime?   @map("finished_at")
+  errorMsg   String?     @map("error_msg")
+  source     FeedSource  @relation(fields: [sourceId], references: [id])
+
+  @@map("crawl_logs")
+}
+
+enum Company {
+  OpenAI
+  Anthropic
+  Google
+  Meta
+  Mistral
+  NVIDIA
+  xAI
+}
+
+enum SourceType {
+  news
+  social
+}
+
+enum CrawlStatus {
+  success
+  failed
+  partial
+}
