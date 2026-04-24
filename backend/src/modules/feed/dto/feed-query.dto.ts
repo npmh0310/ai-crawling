@@ -1,5 +1,5 @@
 import { IsEnum, IsInt, IsOptional, Max, Min } from 'class-validator';
-import { Transform } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 
 export enum CompanyFilter {
   OpenAI = 'OpenAI',
@@ -26,15 +26,15 @@ export class FeedQueryDto {
   sourceType?: SourceTypeFilter;
 
   @IsOptional()
-  @Transform(({ value }) => parseInt(value))
+  @Type(() => Number)
   @IsInt()
   @Min(1)
   page?: number = 1;
 
   @IsOptional()
-  @Transform(({ value }) => parseInt(value))
+  @Type(() => Number)
   @IsInt()
   @Min(1)
   @Max(100)
-  take?: number = 20;
+  take?: number = 10;
 }

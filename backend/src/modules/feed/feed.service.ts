@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { FeedQueryDto } from './dto/feed-query.dto';
 import { formatTimeAgo } from '../../common/utils/time.util';
+import { createPaginatedResponse } from '../../common/responses/api-response.factory';
 
 @Injectable()
 export class FeedService {
@@ -26,19 +27,12 @@ export class FeedService {
       this.prisma.feedItem.count({ where }),
     ]);
 
-    const pageCount = Math.ceil(itemCount / take);
-
-    return {
-      data: items.map(this.toFeedResponse),
-      meta: {
-        page,
-        take,
-        itemCount,
-        pageCount,
-        hasPreviousPage: page > 1,
-        hasNextPage: page < pageCount,
-      },
-    };
+    return createPaginatedResponse(
+      items.map(this.toFeedResponse),
+      page,
+      take,
+      itemCount,
+    );
   }
 
   async getFeedById(id: string) {
