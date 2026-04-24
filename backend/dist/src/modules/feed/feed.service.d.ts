@@ -3,17 +3,7 @@ import { FeedQueryDto } from './dto/feed-query.dto';
 export declare class FeedService {
     private readonly prisma;
     constructor(prisma: PrismaService);
-    getFeeds(query: FeedQueryDto): Promise<{
-        data: any[];
-        meta: {
-            page: number;
-            take: number;
-            itemCount: number;
-            pageCount: number;
-            hasPreviousPage: boolean;
-            hasNextPage: boolean;
-        };
-    }>;
+    getFeeds(query: FeedQueryDto): Promise<import("../../common/interfaces/api-response.interface").PaginatedResponse<any>>;
     getFeedById(id: string): Promise<any>;
     markAsRead(id: string): Promise<void>;
     private toFeedResponse;

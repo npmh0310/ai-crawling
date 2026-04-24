@@ -13,9 +13,21 @@ async function bootstrap() {
     app.useGlobalPipes(new common_1.ValidationPipe({ transform: true, whitelist: true }));
     app.useGlobalInterceptors(new response_interceptor_1.ResponseInterceptor());
     app.useGlobalFilters(new http_exception_filter_1.HttpExceptionFilter());
-    const port = process.env.PORT ?? 3000;
-    await app.listen(port, '0.0.0.0');
-    console.log(`Backend running on http://localhost:${port}`);
+    const basePort = Number(process.env.PORT ?? 3009);
+    const maxAttempts = 10;
+    for (let i = 0; i < maxAttempts; i += 1) {
+        const port = basePort + i;
+        try {
+            await app.listen(port, '0.0.0.0');
+            console.log(`Backend running on http://localhost:${port}`);
+            return;
+        }
+        catch (error) {
+            if (error?.code !== 'EADDRINUSE' || i === maxAttempts - 1) {
+                throw error;
+            }
+        }
+    }
 }
 bootstrap();
 //# sourceMappingURL=main.js.map

@@ -13,6 +13,7 @@ exports.FeedService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../../prisma/prisma.service");
 const time_util_1 = require("../../common/utils/time.util");
+const api_response_factory_1 = require("../../common/responses/api-response.factory");
 let FeedService = class FeedService {
     prisma;
     constructor(prisma) {
@@ -34,18 +35,7 @@ let FeedService = class FeedService {
             }),
             this.prisma.feedItem.count({ where }),
         ]);
-        const pageCount = Math.ceil(itemCount / take);
-        return {
-            data: items.map(this.toFeedResponse),
-            meta: {
-                page,
-                take,
-                itemCount,
-                pageCount,
-                hasPreviousPage: page > 1,
-                hasNextPage: page < pageCount,
-            },
-        };
+        return (0, api_response_factory_1.createPaginatedResponse)(items.map(this.toFeedResponse), page, take, itemCount);
     }
     async getFeedById(id) {
         const item = await this.prisma.feedItem.findUnique({ where: { id } });
