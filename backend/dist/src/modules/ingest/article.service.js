@@ -17,6 +17,7 @@ const rss_service_1 = require("./rss.service");
 const article_crawler_service_1 = require("./article-crawler.service");
 const ai_processor_service_1 = require("../ai-processor/ai-processor.service");
 const rss_sources_1 = require("../sources/rss-sources");
+const config_1 = require("../../config");
 let ArticleService = ArticleService_1 = class ArticleService {
     prisma;
     rssService;
@@ -56,7 +57,7 @@ let ArticleService = ArticleService_1 = class ArticleService {
         if (latest)
             return latest.publishedAt;
         const since = new Date();
-        since.setDate(since.getDate() - 7);
+        since.setDate(since.getDate() - config_1.CONFIG.ingest.firstRunLookbackDays);
         return since;
     }
     async ingestSource(sourceId) {
@@ -70,7 +71,7 @@ let ArticleService = ArticleService_1 = class ArticleService {
         const sinceStr = since.toISOString().split('T')[0];
         this.logger.log(`[${sourceId}] fetching since ${sinceStr}`);
         const { data: items } = await this.rssService.fetchAndParse(rssSource, {
-            take: 50,
+            take: config_1.CONFIG.ingest.maxItemsPerFetch,
             page: 1,
             requestReceivedStart: sinceStr,
         });
@@ -86,6 +87,7 @@ let ArticleService = ArticleService_1 = class ArticleService {
             try {
                 const articleContent = await this.crawlerService.fetchArticleContent(item.link);
                 const content = articleContent?.content ?? item.summary ?? item.title;
+                await new Promise((r) => setTimeout(r, config_1.CONFIG.ingest.aiCallDelayMs));
                 const aiResult = await this.aiService.analyze(item.title, content, item.company);
                 await this.prisma.feedItem.create({
                     data: {
@@ -111,6 +113,16 @@ let ArticleService = ArticleService_1 = class ArticleService {
         }
         skipped = items.length - newItems.length;
         return { sourceId, inserted, skipped, failed };
+    }
+    async resetAll() {
+        const [feedItems, crawlLogs, feedSources] = await this.prisma.$transaction([
+            this.prisma.feedItem.deleteMany(),
+            this.prisma.crawlLog.deleteMany(),
+            this.prisma.feedSource.deleteMany(),
+        ]);
+        this.logger.log(`Reset: ${feedItems.count} items, ${crawlLogs.count} logs, ${feedSources.count} sources deleted`);
+        await this.seedFeedSources();
+        return { deleted: { feedItems: feedItems.count, crawlLogs: crawlLogs.count, feedSources: feedSources.count } };
     }
     async ingestAll() {
         const results = await Promise.allSettled(rss_sources_1.RSS_SOURCES.map((s) => this.ingestSource(s.id)));

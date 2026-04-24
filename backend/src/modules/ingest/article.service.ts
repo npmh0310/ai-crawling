@@ -4,6 +4,7 @@ import { RssService } from './rss.service'
 import { ArticleCrawlerService } from './article-crawler.service'
 import { AiProcessorService } from '../ai-processor/ai-processor.service'
 import { RSS_SOURCES, getRssSource } from '../sources/rss-sources'
+import { CONFIG } from '../../config'
 
 export type IngestResult = {
   sourceId: string
@@ -51,9 +52,8 @@ export class ArticleService implements OnModuleInit {
     })
     if (latest) return latest.publishedAt
 
-    // First run: only fetch last 7 days
     const since = new Date()
-    since.setDate(since.getDate() - 7)
+    since.setDate(since.getDate() - CONFIG.ingest.firstRunLookbackDays)
     return since
   }
 
@@ -70,7 +70,7 @@ export class ArticleService implements OnModuleInit {
     this.logger.log(`[${sourceId}] fetching since ${sinceStr}`)
 
     const { data: items } = await this.rssService.fetchAndParse(rssSource, {
-      take: 50,
+      take: CONFIG.ingest.maxItemsPerFetch,
       page: 1,
       requestReceivedStart: sinceStr,
     })
@@ -90,6 +90,7 @@ export class ArticleService implements OnModuleInit {
         const articleContent = await this.crawlerService.fetchArticleContent(item.link)
         const content = articleContent?.content ?? item.summary ?? item.title
 
+        await new Promise((r) => setTimeout(r, CONFIG.ingest.aiCallDelayMs))
         const aiResult = await this.aiService.analyze(item.title, content, item.company)
 
         await this.prisma.feedItem.create({
@@ -116,6 +117,17 @@ export class ArticleService implements OnModuleInit {
 
     skipped = items.length - newItems.length
     return { sourceId, inserted, skipped, failed }
+  }
+
+  async resetAll(): Promise<{ deleted: { feedItems: number; crawlLogs: number; feedSources: number } }> {
+    const [feedItems, crawlLogs, feedSources] = await this.prisma.$transaction([
+      this.prisma.feedItem.deleteMany(),
+      this.prisma.crawlLog.deleteMany(),
+      this.prisma.feedSource.deleteMany(),
+    ])
+    this.logger.log(`Reset: ${feedItems.count} items, ${crawlLogs.count} logs, ${feedSources.count} sources deleted`)
+    await this.seedFeedSources()
+    return { deleted: { feedItems: feedItems.count, crawlLogs: crawlLogs.count, feedSources: feedSources.count } }
   }
 
   async ingestAll(): Promise<IngestResult[]> {

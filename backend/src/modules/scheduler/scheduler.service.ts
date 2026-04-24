@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common'
 import { Cron } from '@nestjs/schedule'
 import { PrismaService } from '../../prisma/prisma.service'
 import { ArticleService } from '../ingest/article.service'
+import { CONFIG } from '../../config'
 
 @Injectable()
 export class SchedulerService {
@@ -12,7 +13,7 @@ export class SchedulerService {
     private readonly articleService: ArticleService,
   ) {}
 
-  @Cron(process.env.CRON_SCHEDULE ?? '0 6,12,18,0 * * *')
+  @Cron(process.env.CRON_SCHEDULE ?? CONFIG.scheduler.defaultCron)
   async handleCron() {
     this.logger.log('Cron triggered — starting ingest')
 

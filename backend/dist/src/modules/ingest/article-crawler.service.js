@@ -10,6 +10,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ArticleCrawlerService = void 0;
 const common_1 = require("@nestjs/common");
 const article_extractor_1 = require("@extractus/article-extractor");
+const config_1 = require("../../config");
 let ArticleCrawlerService = ArticleCrawlerService_1 = class ArticleCrawlerService {
     logger = new common_1.Logger(ArticleCrawlerService_1.name);
     async fetchArticleContent(url) {
@@ -23,11 +24,11 @@ let ArticleCrawlerService = ArticleCrawlerService_1 = class ArticleCrawlerServic
             if (!article?.content)
                 return null;
             const plainText = this.stripHtml(article.content);
-            if (plainText.length < 100)
+            if (plainText.length < config_1.CONFIG.crawler.minContentLength)
                 return null;
             return {
                 title: article.title ?? '',
-                content: plainText.slice(0, 4000),
+                content: plainText.slice(0, config_1.CONFIG.crawler.maxContentLength),
                 url,
             };
         }

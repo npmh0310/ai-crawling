@@ -20,5 +20,12 @@ export declare class ArticleService implements OnModuleInit {
     private seedFeedSources;
     private getIngestSince;
     ingestSource(sourceId: string): Promise<IngestResult>;
+    resetAll(): Promise<{
+        deleted: {
+            feedItems: number;
+            crawlLogs: number;
+            feedSources: number;
+        };
+    }>;
     ingestAll(): Promise<IngestResult[]>;
 }

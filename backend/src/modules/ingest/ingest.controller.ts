@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Query } from '@nestjs/common'
+import { Controller, Delete, Get, Param, Query } from '@nestjs/common'
 import { FetchRssQueryDto } from './dto/fetch-rss-query.dto'
 import { RSS_SOURCES } from '../sources/rss-sources'
 import { RssService } from './rss.service'
@@ -17,6 +17,30 @@ export class IngestController {
     if (!source) return []
 
     return this.rssService.fetchAndParse(source, query)
+  }
+
+  @Get('preview/:sourceId')
+  async previewSource(@Param('sourceId') sourceId: string) {
+    const source = RSS_SOURCES.find((s) => s.id === sourceId)
+    if (!source) return { error: `Unknown source: ${sourceId}` }
+
+    const { data } = await this.rssService.fetchAndParse(source, { page: 1, take: 50 })
+    return {
+      sourceId,
+      urls: source.urls,
+      count: data.length,
+      items: data.map((i) => ({
+        title: i.title,
+        link: i.link,
+        publishedAt: i.publishedAt,
+        guid: i.guid,
+      })),
+    }
+  }
+
+  @Delete('reset')
+  resetAll() {
+    return this.articleService.resetAll()
   }
 
   @Get('run')

@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { extract } from '@extractus/article-extractor'
+import { CONFIG } from '../../config'
 
 export type ArticleContent = {
   title: string
@@ -23,11 +24,11 @@ export class ArticleCrawlerService {
       if (!article?.content) return null
 
       const plainText = this.stripHtml(article.content)
-      if (plainText.length < 100) return null
+      if (plainText.length < CONFIG.crawler.minContentLength) return null
 
       return {
         title: article.title ?? '',
-        content: plainText.slice(0, 4000),
+        content: plainText.slice(0, CONFIG.crawler.maxContentLength),
         url,
       }
     } catch (err) {

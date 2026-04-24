@@ -31,6 +31,26 @@ let IngestController = class IngestController {
             return [];
         return this.rssService.fetchAndParse(source, query);
     }
+    async previewSource(sourceId) {
+        const source = rss_sources_1.RSS_SOURCES.find((s) => s.id === sourceId);
+        if (!source)
+            return { error: `Unknown source: ${sourceId}` };
+        const { data } = await this.rssService.fetchAndParse(source, { page: 1, take: 50 });
+        return {
+            sourceId,
+            urls: source.urls,
+            count: data.length,
+            items: data.map((i) => ({
+                title: i.title,
+                link: i.link,
+                publishedAt: i.publishedAt,
+                guid: i.guid,
+            })),
+        };
+    }
+    resetAll() {
+        return this.articleService.resetAll();
+    }
     ingestAll() {
         return this.articleService.ingestAll();
     }
@@ -46,6 +66,19 @@ __decorate([
     __metadata("design:paramtypes", [fetch_rss_query_dto_1.FetchRssQueryDto]),
     __metadata("design:returntype", void 0)
 ], IngestController.prototype, "fetchOpenAIFeed", null);
+__decorate([
+    (0, common_1.Get)('preview/:sourceId'),
+    __param(0, (0, common_1.Param)('sourceId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], IngestController.prototype, "previewSource", null);
+__decorate([
+    (0, common_1.Delete)('reset'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], IngestController.prototype, "resetAll", null);
 __decorate([
     (0, common_1.Get)('run'),
     __metadata("design:type", Function),

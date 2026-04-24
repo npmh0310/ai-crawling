@@ -15,6 +15,7 @@ const common_1 = require("@nestjs/common");
 const schedule_1 = require("@nestjs/schedule");
 const prisma_service_1 = require("../../prisma/prisma.service");
 const article_service_1 = require("../ingest/article.service");
+const config_1 = require("../../config");
 let SchedulerService = SchedulerService_1 = class SchedulerService {
     prisma;
     articleService;
@@ -60,7 +61,7 @@ let SchedulerService = SchedulerService_1 = class SchedulerService {
 };
 exports.SchedulerService = SchedulerService;
 __decorate([
-    (0, schedule_1.Cron)(process.env.CRON_SCHEDULE ?? '0 6,12,18,0 * * *'),
+    (0, schedule_1.Cron)(process.env.CRON_SCHEDULE ?? config_1.CONFIG.scheduler.defaultCron),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
