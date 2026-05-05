@@ -20,11 +20,33 @@ let FeedService = class FeedService {
         this.prisma = prisma;
     }
     async getFeeds(query) {
-        const { company, sourceType, page = 1, take = 20 } = query;
+        const { company, sourceType, category, unreadOnly, page = 1, take = 10 } = query;
         const skip = (page - 1) * take;
         const where = {
             ...(company && { company: company }),
             ...(sourceType && { sourceType: sourceType }),
+            ...(category && { category }),
+            ...(unreadOnly && { isRead: false }),
+        };
+        const [items, itemCount] = await Promise.all([
+            this.prisma.feedItem.findMany({
+                where,
+                orderBy: { publishedAt: 'desc' },
+                skip,
+                take,
+            }),
+            this.prisma.feedItem.count({ where }),
+        ]);
+        return (0, api_response_factory_1.createPaginatedResponse)(items.map(this.toFeedResponse), page, take, itemCount);
+    }
+    async searchFeeds(query) {
+        const { q, page = 1, take = 10 } = query;
+        const skip = (page - 1) * take;
+        const where = {
+            OR: [
+                { title: { contains: q, mode: 'insensitive' } },
+                { body: { contains: q, mode: 'insensitive' } },
+            ],
         };
         const [items, itemCount] = await Promise.all([
             this.prisma.feedItem.findMany({
@@ -47,10 +69,14 @@ let FeedService = class FeedService {
         const item = await this.prisma.feedItem.findUnique({ where: { id } });
         if (!item)
             throw new common_1.NotFoundException(`Feed item not found`);
-        await this.prisma.feedItem.update({
-            where: { id },
+        await this.prisma.feedItem.update({ where: { id }, data: { isRead: true } });
+    }
+    async markAllAsRead() {
+        const { count } = await this.prisma.feedItem.updateMany({
+            where: { isRead: false },
             data: { isRead: true },
         });
+        return { updated: count };
     }
     toFeedResponse(item) {
         return {
@@ -66,6 +92,7 @@ let FeedService = class FeedService {
             ...(item.takeaways?.length && { takeaways: item.takeaways }),
             ...(item.tags?.length && { tags: item.tags }),
             originalUrl: item.originalUrl,
+            isRead: item.isRead,
         };
     }
 };

@@ -1,21 +1,23 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
-import { FeedQueryDto } from './dto/feed-query.dto';
-import { formatTimeAgo } from '../../common/utils/time.util';
-import { createPaginatedResponse } from '../../common/responses/api-response.factory';
+import { Injectable, NotFoundException } from '@nestjs/common'
+import { PrismaService } from '../../prisma/prisma.service'
+import { FeedQueryDto, SearchQueryDto } from './dto/feed-query.dto'
+import { formatTimeAgo } from '../../common/utils/time.util'
+import { createPaginatedResponse } from '../../common/responses/api-response.factory'
 
 @Injectable()
 export class FeedService {
   constructor(private readonly prisma: PrismaService) {}
 
   async getFeeds(query: FeedQueryDto) {
-    const { company, sourceType, page = 1, take = 20 } = query;
-    const skip = (page - 1) * take;
+    const { company, sourceType, category, unreadOnly, page = 1, take = 10 } = query
+    const skip = (page - 1) * take
 
     const where = {
       ...(company && { company: company as any }),
       ...(sourceType && { sourceType: sourceType as any }),
-    };
+      ...(category && { category }),
+      ...(unreadOnly && { isRead: false }),
+    }
 
     const [items, itemCount] = await Promise.all([
       this.prisma.feedItem.findMany({
@@ -25,29 +27,53 @@ export class FeedService {
         take,
       }),
       this.prisma.feedItem.count({ where }),
-    ]);
+    ])
 
-    return createPaginatedResponse(
-      items.map(this.toFeedResponse),
-      page,
-      take,
-      itemCount,
-    );
+    return createPaginatedResponse(items.map(this.toFeedResponse), page, take, itemCount)
+  }
+
+  async searchFeeds(query: SearchQueryDto) {
+    const { q, page = 1, take = 10 } = query
+    const skip = (page - 1) * take
+
+    const where = {
+      OR: [
+        { title: { contains: q, mode: 'insensitive' as const } },
+        { body: { contains: q, mode: 'insensitive' as const } },
+      ],
+    }
+
+    const [items, itemCount] = await Promise.all([
+      this.prisma.feedItem.findMany({
+        where,
+        orderBy: { publishedAt: 'desc' },
+        skip,
+        take,
+      }),
+      this.prisma.feedItem.count({ where }),
+    ])
+
+    return createPaginatedResponse(items.map(this.toFeedResponse), page, take, itemCount)
   }
 
   async getFeedById(id: string) {
-    const item = await this.prisma.feedItem.findUnique({ where: { id } });
-    if (!item) throw new NotFoundException(`Feed item not found`);
-    return this.toFeedResponse(item);
+    const item = await this.prisma.feedItem.findUnique({ where: { id } })
+    if (!item) throw new NotFoundException(`Feed item not found`)
+    return this.toFeedResponse(item)
   }
 
   async markAsRead(id: string) {
-    const item = await this.prisma.feedItem.findUnique({ where: { id } });
-    if (!item) throw new NotFoundException(`Feed item not found`);
-    await this.prisma.feedItem.update({
-      where: { id },
+    const item = await this.prisma.feedItem.findUnique({ where: { id } })
+    if (!item) throw new NotFoundException(`Feed item not found`)
+    await this.prisma.feedItem.update({ where: { id }, data: { isRead: true } })
+  }
+
+  async markAllAsRead() {
+    const { count } = await this.prisma.feedItem.updateMany({
+      where: { isRead: false },
       data: { isRead: true },
-    });
+    })
+    return { updated: count }
   }
 
   private toFeedResponse(item: any) {
@@ -64,6 +90,7 @@ export class FeedService {
       ...(item.takeaways?.length && { takeaways: item.takeaways }),
       ...(item.tags?.length && { tags: item.tags }),
       originalUrl: item.originalUrl,
-    };
+      isRead: item.isRead,
+    }
   }
 }

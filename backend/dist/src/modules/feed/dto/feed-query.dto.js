@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.FeedQueryDto = exports.SourceTypeFilter = exports.CompanyFilter = void 0;
+exports.SearchQueryDto = exports.FeedQueryDto = exports.SourceTypeFilter = exports.CompanyFilter = void 0;
 const class_validator_1 = require("class-validator");
 const class_transformer_1 = require("class-transformer");
 var CompanyFilter;
@@ -30,6 +30,8 @@ var SourceTypeFilter;
 class FeedQueryDto {
     company;
     sourceType;
+    category;
+    unreadOnly;
     page = 1;
     take = 10;
 }
@@ -46,6 +48,17 @@ __decorate([
 ], FeedQueryDto.prototype, "sourceType", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], FeedQueryDto.prototype, "category", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_transformer_1.Transform)(({ value }) => value === 'true'),
+    (0, class_validator_1.IsBoolean)(),
+    __metadata("design:type", Boolean)
+], FeedQueryDto.prototype, "unreadOnly", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
     (0, class_transformer_1.Type)(() => Number),
     (0, class_validator_1.IsInt)(),
     (0, class_validator_1.Min)(1),
@@ -59,4 +72,29 @@ __decorate([
     (0, class_validator_1.Max)(100),
     __metadata("design:type", Number)
 ], FeedQueryDto.prototype, "take", void 0);
+class SearchQueryDto {
+    q;
+    page = 1;
+    take = 10;
+}
+exports.SearchQueryDto = SearchQueryDto;
+__decorate([
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], SearchQueryDto.prototype, "q", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_transformer_1.Type)(() => Number),
+    (0, class_validator_1.IsInt)(),
+    (0, class_validator_1.Min)(1),
+    __metadata("design:type", Number)
+], SearchQueryDto.prototype, "page", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_transformer_1.Type)(() => Number),
+    (0, class_validator_1.IsInt)(),
+    (0, class_validator_1.Min)(1),
+    (0, class_validator_1.Max)(100),
+    __metadata("design:type", Number)
+], SearchQueryDto.prototype, "take", void 0);
 //# sourceMappingURL=feed-query.dto.js.map

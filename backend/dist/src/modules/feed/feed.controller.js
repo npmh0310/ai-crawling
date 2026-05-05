@@ -24,6 +24,12 @@ let FeedController = class FeedController {
     getFeeds(query) {
         return this.feedService.getFeeds(query);
     }
+    searchFeeds(query) {
+        return this.feedService.searchFeeds(query);
+    }
+    markAllAsRead() {
+        return this.feedService.markAllAsRead();
+    }
     getFeedById(id) {
         return this.feedService.getFeedById(id);
     }
@@ -39,6 +45,20 @@ __decorate([
     __metadata("design:paramtypes", [feed_query_dto_1.FeedQueryDto]),
     __metadata("design:returntype", void 0)
 ], FeedController.prototype, "getFeeds", null);
+__decorate([
+    (0, common_1.Get)('search'),
+    __param(0, (0, common_1.Query)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [feed_query_dto_1.SearchQueryDto]),
+    __metadata("design:returntype", void 0)
+], FeedController.prototype, "searchFeeds", null);
+__decorate([
+    (0, common_1.Patch)('read-all'),
+    (0, common_1.HttpCode)(200),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], FeedController.prototype, "markAllAsRead", null);
 __decorate([
     (0, common_1.Get)(':id'),
     __param(0, (0, common_1.Param)('id')),

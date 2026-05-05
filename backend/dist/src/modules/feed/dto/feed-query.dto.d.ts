@@ -14,6 +14,13 @@ export declare enum SourceTypeFilter {
 export declare class FeedQueryDto {
     company?: CompanyFilter;
     sourceType?: SourceTypeFilter;
+    category?: string;
+    unreadOnly?: boolean;
+    page?: number;
+    take?: number;
+}
+export declare class SearchQueryDto {
+    q: string;
     page?: number;
     take?: number;
 }
