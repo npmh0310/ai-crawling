@@ -2,17 +2,25 @@ export declare const CONFIG: {
     ingest: {
         firstRunLookbackDays: number;
         maxItemsPerFetch: number;
-        aiCallDelayMs: number;
     };
     crawler: {
         maxContentLength: number;
         minContentLength: number;
+        concurrency: number;
     };
     ai: {
         defaultModel: string;
         promptContentLength: number;
         maxTakeaways: number;
         maxTags: number;
+        rateLimit: {
+            maxRequestsPerMinute: number;
+        };
+        retry: {
+            maxAttempts: number;
+            baseDelayMs: number;
+            maxDelayMs: number;
+        };
     };
     scheduler: {
         defaultCron: string;

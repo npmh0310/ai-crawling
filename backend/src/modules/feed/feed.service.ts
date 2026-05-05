@@ -17,7 +17,7 @@ export class FeedService {
       ...(sourceType && { sourceType: sourceType as any }),
     };
 
-    const [items, itemCount] = await this.prisma.$transaction([
+    const [items, itemCount] = await Promise.all([
       this.prisma.feedItem.findMany({
         where,
         orderBy: { publishedAt: 'desc' },
