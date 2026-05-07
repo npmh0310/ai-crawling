@@ -9,9 +9,14 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SearchQueryDto = exports.FeedQueryDto = exports.SourceTypeFilter = exports.CompanyFilter = void 0;
+exports.SearchQueryDto = exports.FeedQueryDto = exports.SourceTypeFilter = exports.CompanyFilter = exports.LangParam = void 0;
 const class_validator_1 = require("class-validator");
 const class_transformer_1 = require("class-transformer");
+var LangParam;
+(function (LangParam) {
+    LangParam["en"] = "en";
+    LangParam["vi"] = "vi";
+})(LangParam || (exports.LangParam = LangParam = {}));
 var CompanyFilter;
 (function (CompanyFilter) {
     CompanyFilter["OpenAI"] = "OpenAI";
@@ -32,6 +37,7 @@ class FeedQueryDto {
     sourceType;
     category;
     unreadOnly;
+    lang;
     page = 1;
     take = 10;
 }
@@ -59,6 +65,11 @@ __decorate([
 ], FeedQueryDto.prototype, "unreadOnly", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsEnum)(LangParam),
+    __metadata("design:type", String)
+], FeedQueryDto.prototype, "lang", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
     (0, class_transformer_1.Type)(() => Number),
     (0, class_validator_1.IsInt)(),
     (0, class_validator_1.Min)(1),
@@ -74,6 +85,7 @@ __decorate([
 ], FeedQueryDto.prototype, "take", void 0);
 class SearchQueryDto {
     q;
+    lang;
     page = 1;
     take = 10;
 }
@@ -82,6 +94,11 @@ __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], SearchQueryDto.prototype, "q", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsEnum)(LangParam),
+    __metadata("design:type", String)
+], SearchQueryDto.prototype, "lang", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_transformer_1.Type)(() => Number),

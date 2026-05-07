@@ -1,5 +1,5 @@
 import { FeedService } from './feed.service';
-import { FeedQueryDto, SearchQueryDto } from './dto/feed-query.dto';
+import { FeedQueryDto, LangParam, SearchQueryDto } from './dto/feed-query.dto';
 export declare class FeedController {
     private readonly feedService;
     constructor(feedService: FeedService);
@@ -8,6 +8,6 @@ export declare class FeedController {
     markAllAsRead(): Promise<{
         updated: number;
     }>;
-    getFeedById(id: string): Promise<any>;
+    getFeedById(id: string, lang?: LangParam): Promise<any>;
     markAsRead(id: string): Promise<void>;
 }

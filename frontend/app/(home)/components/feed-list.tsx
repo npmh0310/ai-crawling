@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect, useRef } from "react"
 import { BirdIcon, GlobeIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -8,9 +9,25 @@ import { FeedItem } from "./types"
 type Props = {
   items: FeedItem[]
   onItemClick: (item: FeedItem) => void
+  hasNextPage?: boolean
+  isFetchingNextPage?: boolean
+  onLoadMore?: () => void
 }
 
-export function FeedList({ items, onItemClick }: Props) {
+export function FeedList({ items, onItemClick, hasNextPage, isFetchingNextPage, onLoadMore }: Props) {
+  const sentinelRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!onLoadMore || !hasNextPage) return
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) onLoadMore() },
+      { threshold: 0.1 },
+    )
+    const el = sentinelRef.current
+    if (el) observer.observe(el)
+    return () => { if (el) observer.unobserve(el) }
+  }, [onLoadMore, hasNextPage])
+
   return (
     <div className="flex-1 overflow-y-auto border-t">
       {items.map((item, i) => (
@@ -39,6 +56,10 @@ export function FeedList({ items, onItemClick }: Props) {
           </div>
         </div>
       ))}
+
+      <div ref={sentinelRef} className="py-4 text-center text-xs text-muted-foreground">
+        {isFetchingNextPage ? "Loading…" : hasNextPage ? "" : items.length > 0 ? "No more items" : ""}
+      </div>
     </div>
   )
 }

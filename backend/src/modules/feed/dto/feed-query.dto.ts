@@ -1,6 +1,11 @@
 import { IsBoolean, IsEnum, IsInt, IsOptional, IsString, Max, Min } from 'class-validator'
 import { Transform, Type } from 'class-transformer'
 
+export enum LangParam {
+  en = 'en',
+  vi = 'vi',
+}
+
 export enum CompanyFilter {
   OpenAI = 'OpenAI',
   Anthropic = 'Anthropic',
@@ -35,6 +40,10 @@ export class FeedQueryDto {
   unreadOnly?: boolean
 
   @IsOptional()
+  @IsEnum(LangParam)
+  lang?: LangParam
+
+  @IsOptional()
   @Type(() => Number)
   @IsInt()
   @Min(1)
@@ -51,6 +60,10 @@ export class FeedQueryDto {
 export class SearchQueryDto {
   @IsString()
   q: string
+
+  @IsOptional()
+  @IsEnum(LangParam)
+  lang?: LangParam
 
   @IsOptional()
   @Type(() => Number)

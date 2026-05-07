@@ -12,7 +12,10 @@ Content: ${content.slice(0, config_1.CONFIG.ai.promptContentLength)}
 Return exactly this JSON shape:
 {
   "category": "one of: model-release | product-update | research | safety | policy | business | general",
-  "takeaways": ["max ${config_1.CONFIG.ai.maxTakeaways} concise bullet points as plain strings"],
+  "title_vi": "Vietnamese translation of the title",
+  "body_vi": "Vietnamese summary of the article in under 150 words",
+  "takeaways_en": ["max ${config_1.CONFIG.ai.maxTakeaways} concise bullet points in English"],
+  "takeaways_vi": ["max ${config_1.CONFIG.ai.maxTakeaways} concise bullet points in Vietnamese"],
   "tags": ["max ${config_1.CONFIG.ai.maxTags} lowercase keyword tags"]
 }`;
 }

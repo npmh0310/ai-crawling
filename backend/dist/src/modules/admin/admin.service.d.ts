@@ -13,8 +13,8 @@ export declare class AdminService {
         lastSyncAt: Date | null;
     }[]>;
     toggleSource(id: string): Promise<{
-        id: string;
         company: import("@prisma/client").$Enums.Company;
+        id: string;
         name: string;
         isActive: boolean;
     }>;

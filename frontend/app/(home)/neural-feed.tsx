@@ -1,18 +1,16 @@
 "use client"
 
-// ─── External ─────────────────────────────────────────────────────────────────
-import { useState } from "react"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { useCallback, useState } from "react"
+import { useInfiniteQuery } from "@tanstack/react-query"
+import { useLocale } from "next-intl"
+import { useRouter, useSearchParams } from "next/navigation"
 
-// ─── Internal ─────────────────────────────────────────────────────────────────
-import { toast } from "@/lib/toast"
 import { FeedDetailSheet } from "./components/feed-detail-sheet"
 import { FeedList } from "./components/feed-list"
 import { IntelligenceHeader } from "./components/intelligence-header"
-import { feedApiService, feedQueryKeys } from "./services/feed"
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-import { type FeedItem } from "./components/types"
+import { StreamFilter } from "./components/stream-filter"
+import { type Company, type FeedItem, type SourceType } from "./components/types"
+import { feedQueryKeys } from "./services/feed"
 
 // =============================================================================
 // Component
@@ -20,32 +18,53 @@ import { type FeedItem } from "./components/types"
 
 export function NeuralFeed() {
   // ── Hooks ──────────────────────────────────────────────────────────────────
-  const queryClient = useQueryClient()
+  const locale = useLocale()
+  const router = useRouter()
+  const searchParams = useSearchParams()
   const [selectedItem, setSelectedItem] = useState<FeedItem | null>(null)
   const [isSheetOpen, setIsSheetOpen] = useState(false)
 
-  const { data, isLoading, isFetching } = useQuery(feedQueryKeys.list())
+  const sourceFilter = (searchParams.get("source") as SourceType) ?? "all"
+  const activeCompany = (searchParams.get("company") as Company | null) ?? null
 
-  const { mutate: markRead } = useMutation({
-    mutationFn: (id: string) => feedApiService.markFeedRead(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: feedQueryKeys.lists() })
-      toast.success("Marked as read")
-    },
-    onError: () => {
-      toast.error("Failed to mark as read")
-    },
-  })
+  const setParams = useCallback((updates: Record<string, string | null>) => {
+    const params = new URLSearchParams(searchParams.toString())
+    for (const [key, value] of Object.entries(updates)) {
+      if (value === null) params.delete(key)
+      else params.set(key, value)
+    }
+    router.replace(`?${params.toString()}`, { scroll: false })
+  }, [router, searchParams])
+
+  const feedQuery = {
+    ...(activeCompany && { company: activeCompany }),
+    ...(sourceFilter !== "all" && { sourceType: sourceFilter as "news" | "social" }),
+    lang: locale as "en" | "vi",
+  }
+
+  const { data, isLoading, isFetchingNextPage, fetchNextPage, hasNextPage } =
+    useInfiniteQuery(feedQueryKeys.infinite(feedQuery))
 
   // ── Handlers ───────────────────────────────────────────────────────────────
   function handleItemClick(item: FeedItem) {
     setSelectedItem(item)
     setIsSheetOpen(true)
-    markRead(item.id)
+  }
+
+  function handleSourceChange(source: SourceType) {
+    setParams({ source: source === "all" ? null : source })
+  }
+
+  function handleCompanyChange(company: Company | null) {
+    setParams({ company })
+  }
+
+  function handleReset() {
+    setParams({ source: null, company: null })
   }
 
   // ── Derived state ──────────────────────────────────────────────────────────
-  const items = data?.data ?? []
+  const items = data?.pages.flatMap((p) => p.data ?? []) ?? []
 
   // ── Early returns ──────────────────────────────────────────────────────────
   if (isLoading) {
@@ -59,11 +78,26 @@ export function NeuralFeed() {
   // ── JSX ────────────────────────────────────────────────────────────────────
   return (
     <div className="flex h-full flex-col">
-      <IntelligenceHeader />
-      {isFetching && (
-        <p className="px-4 py-1 text-xs text-muted-foreground">Refreshing…</p>
-      )}
-      <FeedList items={items} onItemClick={handleItemClick} />
+      <IntelligenceHeader items={items} />
+
+      <div className="px-10">
+        <StreamFilter
+          sourceFilter={sourceFilter}
+          activeCompany={activeCompany}
+          onSourceChange={handleSourceChange}
+          onCompanyChange={handleCompanyChange}
+          onReset={handleReset}
+        />
+      </div>
+
+      <FeedList
+        items={items}
+        onItemClick={handleItemClick}
+        hasNextPage={hasNextPage}
+        isFetchingNextPage={isFetchingNextPage}
+        onLoadMore={fetchNextPage}
+      />
+
       <FeedDetailSheet
         item={selectedItem}
         open={isSheetOpen}

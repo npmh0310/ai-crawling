@@ -4,8 +4,9 @@ import { ArticleService } from './article.service';
 export declare class IngestController {
     private readonly rssService;
     private readonly articleService;
+    private readonly logger;
     constructor(rssService: RssService, articleService: ArticleService);
-    fetchOpenAIFeed(query: FetchRssQueryDto): never[] | Promise<import("../../common/interfaces/api-response.interface").PaginatedResponse<import("./rss.service").NormalizedRssItem>>;
+    fetchOpenAIFeed(query: FetchRssQueryDto): Promise<import("../../common/interfaces/api-response.interface").PaginatedResponse<import("./rss.service").NormalizedRssItem>> | never[];
     previewSource(sourceId: string): Promise<{
         error: string;
         sourceId?: undefined;
@@ -24,6 +25,9 @@ export declare class IngestController {
         }[];
         error?: undefined;
     }>;
+    backfillVietnamese(): {
+        message: string;
+    };
     resetAll(): Promise<{
         deleted: {
             feedItems: number;
@@ -31,6 +35,10 @@ export declare class IngestController {
             feedSources: number;
         };
     }>;
-    ingestAll(): Promise<import("./article.service").IngestResult[]>;
-    ingestSource(sourceId: string): Promise<import("./article.service").IngestResult>;
+    ingestAll(): {
+        message: string;
+    };
+    ingestSource(sourceId: string): {
+        message: string;
+    };
 }

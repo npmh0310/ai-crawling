@@ -26,10 +26,13 @@ model FeedItem {
   sourceType  SourceType @map("source_type")
   category    String     @default("general")
   title       String
+  titleVi     String?    @map("title_vi")
   body        String?
+  bodyVi      String?    @map("body_vi")
   quote       String?
   handle      String?
   takeaways   String[]
+  takeawaysVi String[]   @default([]) @map("takeaways_vi")
   tags        String[]
   originalUrl String?    @map("original_url")
   publishedAt DateTime   @map("published_at")

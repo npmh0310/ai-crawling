@@ -27,7 +27,16 @@ export function FeedDetailSheet({ item, open, onOpenChange }: Props) {
               <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
                 {t("intelligenceBrief")}
               </span>
-              <ExternalLinkIcon className="size-3.5 shrink-0 text-muted-foreground" />
+              {item.originalUrl && (
+                <a
+                  href={item.originalUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  <ExternalLinkIcon className="size-3.5 shrink-0" />
+                </a>
+              )}
             </SheetHeader>
 
             <div className="flex-1 overflow-y-auto px-4 py-4">

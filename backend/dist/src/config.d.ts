@@ -1,6 +1,7 @@
 export declare const CONFIG: {
     ingest: {
         firstRunLookbackDays: number;
+        cronLookbackHours: number;
         maxItemsPerFetch: number;
     };
     crawler: {
@@ -11,6 +12,7 @@ export declare const CONFIG: {
     ai: {
         defaultModel: string;
         promptContentLength: number;
+        maxBodyChars: number;
         maxTakeaways: number;
         maxTags: number;
         rateLimit: {

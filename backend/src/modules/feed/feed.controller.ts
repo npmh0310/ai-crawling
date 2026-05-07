@@ -1,6 +1,6 @@
 import { Controller, Get, HttpCode, Param, Patch, Query } from '@nestjs/common'
 import { FeedService } from './feed.service'
-import { FeedQueryDto, SearchQueryDto } from './dto/feed-query.dto'
+import { FeedQueryDto, LangParam, SearchQueryDto } from './dto/feed-query.dto'
 
 @Controller('feed')
 export class FeedController {
@@ -23,8 +23,8 @@ export class FeedController {
   }
 
   @Get(':id')
-  getFeedById(@Param('id') id: string) {
-    return this.feedService.getFeedById(id)
+  getFeedById(@Param('id') id: string, @Query('lang') lang?: LangParam) {
+    return this.feedService.getFeedById(id, lang)
   }
 
   @Patch(':id/read')

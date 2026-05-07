@@ -39,7 +39,12 @@ let ArticleService = ArticleService_1 = class ArticleService {
         this.aiService = aiService;
     }
     async onModuleInit() {
-        await this.seedFeedSources();
+        try {
+            await this.seedFeedSources();
+        }
+        catch (err) {
+            this.logger.error('Failed to seed feed sources — DB may be unavailable', err);
+        }
     }
     async seedFeedSources() {
         for (const source of rss_sources_1.RSS_SOURCES) {
@@ -62,8 +67,10 @@ let ArticleService = ArticleService_1 = class ArticleService {
             orderBy: { publishedAt: 'desc' },
             select: { publishedAt: true },
         });
-        if (latest)
-            return latest.publishedAt;
+        if (latest) {
+            const cronFloor = new Date(Date.now() - config_1.CONFIG.ingest.cronLookbackHours * 60 * 60 * 1000);
+            return latest.publishedAt > cronFloor ? latest.publishedAt : cronFloor;
+        }
         const since = new Date();
         since.setDate(since.getDate() - config_1.CONFIG.ingest.firstRunLookbackDays);
         return since;
@@ -121,8 +128,11 @@ let ArticleService = ArticleService_1 = class ArticleService {
                             sourceType: 'news',
                             category: aiResult.category,
                             title: item.title,
+                            titleVi: aiResult.titleVi || null,
                             body: content,
+                            bodyVi: aiResult.bodyVi || null,
                             takeaways: aiResult.takeaways,
+                            takeawaysVi: aiResult.takeawaysVi,
                             tags: aiResult.tags,
                             originalUrl: item.link,
                             publishedAt: item.publishedAt ?? new Date(),
@@ -137,19 +147,61 @@ let ArticleService = ArticleService_1 = class ArticleService {
                 }
             }
             const status = inserted === 0 && failed > 0 ? 'failed' : failed > 0 ? 'partial' : 'success';
-            await this.prisma.crawlLog.update({
+            await this.prisma.crawlLog.updateMany({
                 where: { id: log.id },
                 data: { status, itemsFound: items.length, itemsNew: inserted, finishedAt: new Date() },
             });
             return { sourceId, inserted, skipped, failed };
         }
         catch (err) {
-            await this.prisma.crawlLog.update({
+            await this.prisma.crawlLog.updateMany({
                 where: { id: log.id },
                 data: { status: 'failed', errorMsg: err.message, finishedAt: new Date() },
             });
             throw err;
         }
+    }
+    async backfillVietnamese() {
+        const items = await this.prisma.feedItem.findMany({
+            where: {
+                OR: [
+                    { takeawaysVi: { equals: [] } },
+                    { titleVi: null },
+                ],
+            },
+            select: { id: true, title: true, body: true, company: true },
+        });
+        this.logger.log(`[backfill-vi] ${items.length} items need Vietnamese`);
+        let updated = 0;
+        let failed = 0;
+        for (const item of items) {
+            try {
+                await this.rateLimiter.acquire();
+                const aiResult = await (0, retry_util_1.withRetry)(() => this.aiService.analyze(item.title, item.body ?? item.title, item.company), {
+                    maxAttempts: config_1.CONFIG.ai.retry.maxAttempts,
+                    baseDelayMs: config_1.CONFIG.ai.retry.baseDelayMs,
+                    maxDelayMs: config_1.CONFIG.ai.retry.maxDelayMs,
+                    shouldRetry: (e) => !e.message.includes('400'),
+                });
+                if (aiResult.takeawaysVi.length > 0 || aiResult.titleVi) {
+                    await this.prisma.feedItem.update({
+                        where: { id: item.id },
+                        data: {
+                            takeawaysVi: aiResult.takeawaysVi,
+                            titleVi: aiResult.titleVi || null,
+                            bodyVi: aiResult.bodyVi || null,
+                        },
+                    });
+                    updated++;
+                }
+            }
+            catch (err) {
+                this.logger.warn(`[backfill-vi] Failed "${item.title}": ${err.message}`);
+                failed++;
+            }
+        }
+        this.logger.log(`[backfill-vi] done: ${updated} updated, ${failed} failed`);
+        return { updated, failed };
     }
     async ingestAll() {
         const results = await Promise.allSettled(rss_sources_1.RSS_SOURCES.map((s) => this.ingestSource(s.id)));

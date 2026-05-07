@@ -1,6 +1,7 @@
 export const CONFIG = {
   ingest: {
     firstRunLookbackDays: 7,
+    cronLookbackHours: 25,
     maxItemsPerFetch: 50,
   },
   crawler: {
@@ -10,7 +11,8 @@ export const CONFIG = {
   },
   ai: {
     defaultModel: 'gemma-4-26b-a4b-it',
-    promptContentLength: 3000,
+    promptContentLength: 4000,
+    maxBodyChars: 1000,
     maxTakeaways: 3,
     maxTags: 5,
     rateLimit: {

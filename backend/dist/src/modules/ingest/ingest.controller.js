@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
+var IngestController_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.IngestController = void 0;
 const common_1 = require("@nestjs/common");
@@ -18,9 +19,10 @@ const fetch_rss_query_dto_1 = require("./dto/fetch-rss-query.dto");
 const rss_sources_1 = require("../sources/rss-sources");
 const rss_service_1 = require("./rss.service");
 const article_service_1 = require("./article.service");
-let IngestController = class IngestController {
+let IngestController = IngestController_1 = class IngestController {
     rssService;
     articleService;
+    logger = new common_1.Logger(IngestController_1.name);
     constructor(rssService, articleService) {
         this.rssService = rssService;
         this.articleService = articleService;
@@ -48,14 +50,20 @@ let IngestController = class IngestController {
             })),
         };
     }
+    backfillVietnamese() {
+        this.articleService.backfillVietnamese().catch((err) => this.logger.error(`backfill-vi failed: ${err.message}`));
+        return { message: 'Backfill started — check server logs for progress' };
+    }
     resetAll() {
         return this.articleService.resetAll();
     }
     ingestAll() {
-        return this.articleService.ingestAll();
+        this.articleService.ingestAll().catch((err) => this.logger.error(`ingestAll failed: ${err.message}`));
+        return { message: 'Ingest started — check server logs for progress' };
     }
     ingestSource(sourceId) {
-        return this.articleService.ingestSource(sourceId);
+        this.articleService.ingestSource(sourceId).catch((err) => this.logger.error(`ingestSource(${sourceId}) failed: ${err.message}`));
+        return { message: `Ingest started for ${sourceId} — check server logs for progress` };
     }
 };
 exports.IngestController = IngestController;
@@ -73,6 +81,12 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], IngestController.prototype, "previewSource", null);
+__decorate([
+    (0, common_1.Get)('backfill-vi'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], IngestController.prototype, "backfillVietnamese", null);
 __decorate([
     (0, common_1.Delete)('reset'),
     __metadata("design:type", Function),
@@ -92,7 +106,7 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], IngestController.prototype, "ingestSource", null);
-exports.IngestController = IngestController = __decorate([
+exports.IngestController = IngestController = IngestController_1 = __decorate([
     (0, common_1.Controller)('ingest'),
     __metadata("design:paramtypes", [rss_service_1.RssService,
         article_service_1.ArticleService])

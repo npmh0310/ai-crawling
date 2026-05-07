@@ -12,7 +12,7 @@ const common_1 = require("@nestjs/common");
 const generative_ai_1 = require("@google/generative-ai");
 const analyze_article_prompt_1 = require("./prompts/analyze-article.prompt");
 const config_1 = require("../../config");
-const FALLBACK = { category: 'general', takeaways: [], tags: [] };
+const FALLBACK = { category: 'general', titleVi: '', bodyVi: '', takeaways: [], takeawaysVi: [], tags: [] };
 function extractJsonObject(text) {
     const start = text.indexOf('{');
     if (start === -1)
@@ -51,7 +51,7 @@ let AiProcessorService = AiProcessorService_1 = class AiProcessorService {
     model = new generative_ai_1.GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY ?? '').getGenerativeModel({
         model: process.env.AI_MODEL ?? config_1.CONFIG.ai.defaultModel,
         generationConfig: { responseMimeType: 'application/json' },
-    }, { timeout: 30000 });
+    }, { timeout: 60000 });
     async analyze(title, content, company) {
         try {
             const prompt = (0, analyze_article_prompt_1.buildAnalyzePrompt)(title, content, company);
@@ -62,9 +62,24 @@ let AiProcessorService = AiProcessorService_1 = class AiProcessorService {
             if (!jsonStr)
                 throw new Error(`No JSON object in response: ${stripped.slice(0, 100)}`);
             const parsed = JSON.parse(jsonStr);
+            const isPromptEcho = (arr) => Array.isArray(arr) && arr.some((s) => typeof s === 'string' && (s.includes('max') && s.includes('bullet points')));
+            const category = parsed.category && !parsed.category.includes('one of:')
+                ? parsed.category
+                : 'general';
+            if (isPromptEcho(parsed.takeaways_en) || isPromptEcho(parsed.takeaways_vi)) {
+                this.logger.warn(`AI returned prompt template verbatim for "${title}" — using fallback`);
+                return FALLBACK;
+            }
             return {
-                category: parsed.category ?? 'general',
-                takeaways: Array.isArray(parsed.takeaways) ? parsed.takeaways.slice(0, config_1.CONFIG.ai.maxTakeaways) : [],
+                category,
+                titleVi: typeof parsed.title_vi === 'string' ? parsed.title_vi : '',
+                bodyVi: typeof parsed.body_vi === 'string' ? parsed.body_vi.slice(0, 1000) : '',
+                takeaways: Array.isArray(parsed.takeaways_en)
+                    ? parsed.takeaways_en.slice(0, config_1.CONFIG.ai.maxTakeaways)
+                    : [],
+                takeawaysVi: Array.isArray(parsed.takeaways_vi)
+                    ? parsed.takeaways_vi.slice(0, config_1.CONFIG.ai.maxTakeaways)
+                    : [],
                 tags: Array.isArray(parsed.tags) ? parsed.tags.slice(0, config_1.CONFIG.ai.maxTags) : [],
             };
         }

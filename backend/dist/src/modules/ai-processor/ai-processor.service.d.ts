@@ -1,6 +1,9 @@
 export type AiAnalysisResult = {
     category: string;
+    titleVi: string;
+    bodyVi: string;
     takeaways: string[];
+    takeawaysVi: string[];
     tags: string[];
 };
 export declare class AiProcessorService {
