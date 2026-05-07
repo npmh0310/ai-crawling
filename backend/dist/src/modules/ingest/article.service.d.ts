@@ -15,10 +15,23 @@ export declare class ArticleService implements OnModuleInit {
     private readonly crawlerService;
     private readonly aiService;
     private readonly logger;
+    private readonly crawlLimit;
+    private readonly rateLimiter;
     constructor(prisma: PrismaService, rssService: RssService, crawlerService: ArticleCrawlerService, aiService: AiProcessorService);
     onModuleInit(): Promise<void>;
     private seedFeedSources;
     private getIngestSince;
     ingestSource(sourceId: string): Promise<IngestResult>;
+    backfillVietnamese(): Promise<{
+        updated: number;
+        failed: number;
+    }>;
     ingestAll(): Promise<IngestResult[]>;
+    resetAll(): Promise<{
+        deleted: {
+            feedItems: number;
+            crawlLogs: number;
+            feedSources: number;
+        };
+    }>;
 }

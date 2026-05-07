@@ -14,6 +14,7 @@ const feed_module_1 = require("./modules/feed/feed.module");
 const ingest_module_1 = require("./modules/ingest/ingest.module");
 const ai_processor_module_1 = require("./modules/ai-processor/ai-processor.module");
 const scheduler_module_1 = require("./modules/scheduler/scheduler.module");
+const admin_module_1 = require("./modules/admin/admin.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -26,6 +27,7 @@ exports.AppModule = AppModule = __decorate([
             ingest_module_1.IngestModule,
             ai_processor_module_1.AiProcessorModule,
             scheduler_module_1.SchedulerModule,
+            admin_module_1.AdminModule,
         ],
     })
 ], AppModule);

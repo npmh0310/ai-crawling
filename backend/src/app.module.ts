@@ -5,6 +5,7 @@ import { FeedModule } from './modules/feed/feed.module';
 import { IngestModule } from './modules/ingest/ingest.module';
 import { AiProcessorModule } from './modules/ai-processor/ai-processor.module';
 import { SchedulerModule } from './modules/scheduler/scheduler.module';
+import { AdminModule } from './modules/admin/admin.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { SchedulerModule } from './modules/scheduler/scheduler.module';
     IngestModule,
     AiProcessorModule,
     SchedulerModule,
+    AdminModule,
   ],
 })
 export class AppModule {}

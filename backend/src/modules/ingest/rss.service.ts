@@ -25,6 +25,8 @@ export class RssService {
     attributeNamePrefix: '@_',
     removeNSPrefix: true,
     trimValues: true,
+    processEntities: false,
+    htmlEntities: true,
   })
 
   async fetchAndParse(
@@ -50,8 +52,10 @@ export class RssService {
   ): Promise<NormalizedRssItem[]> {
     const response = await fetch(url, {
       headers: {
-        'user-agent': 'ai-crawling-bot/1.0',
+        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
         accept: 'application/rss+xml, application/xml, text/xml, */*',
+        'accept-language': 'en-US,en;q=0.9',
+        'cache-control': 'no-cache',
       },
     })
 
@@ -134,17 +138,19 @@ export class RssService {
     const take = query.take ?? 10
     const skip = (page - 1) * take
 
+    const now = Date.now()
     const filtered = items
-      .filter((item) => item.publishedAt)
       .filter((item) => {
-        const publishedAt = item.publishedAt?.getTime() ?? 0
+        // items without date → treat as current, always include
+        if (!item.publishedAt) return true
+        const publishedAt = item.publishedAt.getTime()
         if (start !== null && publishedAt < start) return false
         if (end !== null && publishedAt > end) return false
         return true
       })
       .sort((a, b) => {
-        const timeA = a.publishedAt?.getTime() ?? 0
-        const timeB = b.publishedAt?.getTime() ?? 0
+        const timeA = a.publishedAt?.getTime() ?? now
+        const timeB = b.publishedAt?.getTime() ?? now
         return timeB - timeA
       })
 

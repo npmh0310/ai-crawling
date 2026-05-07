@@ -1,3 +1,7 @@
+export declare enum LangParam {
+    en = "en",
+    vi = "vi"
+}
 export declare enum CompanyFilter {
     OpenAI = "OpenAI",
     Anthropic = "Anthropic",
@@ -14,6 +18,15 @@ export declare enum SourceTypeFilter {
 export declare class FeedQueryDto {
     company?: CompanyFilter;
     sourceType?: SourceTypeFilter;
+    category?: string;
+    unreadOnly?: boolean;
+    lang?: LangParam;
+    page?: number;
+    take?: number;
+}
+export declare class SearchQueryDto {
+    q: string;
+    lang?: LangParam;
     page?: number;
     take?: number;
 }

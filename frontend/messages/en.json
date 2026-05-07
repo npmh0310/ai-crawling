@@ -30,7 +30,8 @@
     "searchPlaceholder": "Search intelligence, entities, or hashtags...",
     "searchPages": "Pages",
     "searchNoResults": "No results found.",
-    "searchGoToPage": "Go to Page"
+    "searchGoToPage": "Go to Page",
+    "searchOpenDetail": "Open Detail"
   },
   "neuralFeed": {
     "title": "Intelligence Aggregator",

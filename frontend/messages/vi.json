@@ -30,7 +30,8 @@
     "searchPlaceholder": "Tìm kiếm thông tin, thực thể hoặc hashtag...",
     "searchPages": "Trang",
     "searchNoResults": "Không tìm thấy kết quả.",
-    "searchGoToPage": "Đi đến trang"
+    "searchGoToPage": "Đi đến trang",
+    "searchOpenDetail": "Xem chi tiết"
   },
   "neuralFeed": {
     "title": "Tổng hợp thông tin",

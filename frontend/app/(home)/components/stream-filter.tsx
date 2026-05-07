@@ -8,13 +8,13 @@ import { COMPANIES, Company, SourceType } from "./types"
 
 type Props = {
   sourceFilter: SourceType
-  activeCompanies: Set<Company>
+  activeCompany: Company | null
   onSourceChange: (source: SourceType) => void
-  onCompanyToggle: (company: Company) => void
+  onCompanyChange: (company: Company | null) => void
   onReset: () => void
 }
 
-export function StreamFilter({ sourceFilter, activeCompanies, onSourceChange, onCompanyToggle, onReset }: Props) {
+export function StreamFilter({ sourceFilter, activeCompany, onSourceChange, onCompanyChange, onReset }: Props) {
   const t = useTranslations("neuralFeed")
 
   return (
@@ -57,10 +57,10 @@ export function StreamFilter({ sourceFilter, activeCompanies, onSourceChange, on
             {COMPANIES.map((c) => (
               <button
                 key={c}
-                onClick={() => onCompanyToggle(c)}
+                onClick={() => onCompanyChange(activeCompany === c ? null : c)}
                 className={cn(
                   "rounded border px-2.5 py-0.5 text-xs font-medium transition-colors",
-                  activeCompanies.has(c)
+                  activeCompany === c
                     ? "border-foreground bg-foreground text-background"
                     : "border-border text-muted-foreground hover:border-foreground hover:text-foreground"
                 )}

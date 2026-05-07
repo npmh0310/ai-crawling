@@ -18,6 +18,8 @@ let RssService = RssService_1 = class RssService {
         attributeNamePrefix: '@_',
         removeNSPrefix: true,
         trimValues: true,
+        processEntities: false,
+        htmlEntities: true,
     });
     async fetchAndParse(source, query) {
         const results = await Promise.allSettled(source.urls.map((url) => this.fetchFeed(url, source)));
@@ -32,8 +34,10 @@ let RssService = RssService_1 = class RssService {
     async fetchFeed(url, source) {
         const response = await fetch(url, {
             headers: {
-                'user-agent': 'ai-crawling-bot/1.0',
+                'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
                 accept: 'application/rss+xml, application/xml, text/xml, */*',
+                'accept-language': 'en-US,en;q=0.9',
+                'cache-control': 'no-cache',
             },
         });
         if (!response.ok) {
@@ -113,10 +117,12 @@ let RssService = RssService_1 = class RssService {
         const page = query.page ?? 1;
         const take = query.take ?? 10;
         const skip = (page - 1) * take;
+        const now = Date.now();
         const filtered = items
-            .filter((item) => item.publishedAt)
             .filter((item) => {
-            const publishedAt = item.publishedAt?.getTime() ?? 0;
+            if (!item.publishedAt)
+                return true;
+            const publishedAt = item.publishedAt.getTime();
             if (start !== null && publishedAt < start)
                 return false;
             if (end !== null && publishedAt > end)
@@ -124,8 +130,8 @@ let RssService = RssService_1 = class RssService {
             return true;
         })
             .sort((a, b) => {
-            const timeA = a.publishedAt?.getTime() ?? 0;
-            const timeB = b.publishedAt?.getTime() ?? 0;
+            const timeA = a.publishedAt?.getTime() ?? now;
+            const timeB = b.publishedAt?.getTime() ?? now;
             return timeB - timeA;
         });
         const itemCount = filtered.length;

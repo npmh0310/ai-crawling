@@ -11,21 +11,76 @@ exports.AiProcessorService = void 0;
 const common_1 = require("@nestjs/common");
 const generative_ai_1 = require("@google/generative-ai");
 const analyze_article_prompt_1 = require("./prompts/analyze-article.prompt");
-const FALLBACK = { category: 'general', takeaways: [], tags: [] };
+const config_1 = require("../../config");
+const FALLBACK = { category: 'general', titleVi: '', bodyVi: '', takeaways: [], takeawaysVi: [], tags: [] };
+function extractJsonObject(text) {
+    const start = text.indexOf('{');
+    if (start === -1)
+        return null;
+    let depth = 0;
+    let inString = false;
+    let escape = false;
+    for (let i = start; i < text.length; i++) {
+        const ch = text[i];
+        if (escape) {
+            escape = false;
+            continue;
+        }
+        if (ch === '\\' && inString) {
+            escape = true;
+            continue;
+        }
+        if (ch === '"') {
+            inString = !inString;
+            continue;
+        }
+        if (inString)
+            continue;
+        if (ch === '{')
+            depth++;
+        else if (ch === '}') {
+            depth--;
+            if (depth === 0)
+                return text.slice(start, i + 1);
+        }
+    }
+    return null;
+}
 let AiProcessorService = AiProcessorService_1 = class AiProcessorService {
     logger = new common_1.Logger(AiProcessorService_1.name);
-    model = new generative_ai_1.GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY ?? '').getGenerativeModel({ model: 'gemini-1.5-flash' });
+    model = new generative_ai_1.GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY ?? '').getGenerativeModel({
+        model: process.env.AI_MODEL ?? config_1.CONFIG.ai.defaultModel,
+        generationConfig: { responseMimeType: 'application/json' },
+    }, { timeout: 60000 });
     async analyze(title, content, company) {
         try {
             const prompt = (0, analyze_article_prompt_1.buildAnalyzePrompt)(title, content, company);
             const result = await this.model.generateContent(prompt);
             const text = result.response.text().trim();
-            const json = text.replace(/^```json\s*/i, '').replace(/```\s*$/, '').trim();
-            const parsed = JSON.parse(json);
+            const stripped = text.replace(/^```json\s*/i, '').replace(/```\s*$/, '').trim();
+            const jsonStr = extractJsonObject(stripped);
+            if (!jsonStr)
+                throw new Error(`No JSON object in response: ${stripped.slice(0, 100)}`);
+            const parsed = JSON.parse(jsonStr);
+            const isPromptEcho = (arr) => Array.isArray(arr) && arr.some((s) => typeof s === 'string' && (s.includes('max') && s.includes('bullet points')));
+            const category = parsed.category && !parsed.category.includes('one of:')
+                ? parsed.category
+                : 'general';
+            if (isPromptEcho(parsed.takeaways_en) || isPromptEcho(parsed.takeaways_vi)) {
+                this.logger.warn(`AI returned prompt template verbatim for "${title}" — using fallback`);
+                return FALLBACK;
+            }
             return {
-                category: parsed.category ?? 'general',
-                takeaways: Array.isArray(parsed.takeaways) ? parsed.takeaways.slice(0, 3) : [],
-                tags: Array.isArray(parsed.tags) ? parsed.tags.slice(0, 5) : [],
+                category,
+                titleVi: typeof parsed.title_vi === 'string' ? parsed.title_vi : '',
+                bodyVi: typeof parsed.body_vi === 'string' ? parsed.body_vi.slice(0, 1000) : '',
+                takeaways: Array.isArray(parsed.takeaways_en)
+                    ? parsed.takeaways_en.slice(0, config_1.CONFIG.ai.maxTakeaways)
+                    : [],
+                takeawaysVi: Array.isArray(parsed.takeaways_vi)
+                    ? parsed.takeaways_vi.slice(0, config_1.CONFIG.ai.maxTakeaways)
+                    : [],
+                tags: Array.isArray(parsed.tags) ? parsed.tags.slice(0, config_1.CONFIG.ai.maxTags) : [],
             };
         }
         catch (err) {
