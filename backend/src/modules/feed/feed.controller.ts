@@ -11,6 +11,11 @@ export class FeedController {
     return this.feedService.getFeeds(query)
   }
 
+  @Get('crawl-stats')
+  getCrawlStats() {
+    return this.feedService.getCrawlStats()
+  }
+
   @Get('search')
   searchFeeds(@Query() query: SearchQueryDto) {
     return this.feedService.searchFeeds(query)

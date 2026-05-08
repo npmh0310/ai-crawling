@@ -1,0 +1,6 @@
+.env
+*.env
+cookies.json
+*.db
+*.key
+*.pem

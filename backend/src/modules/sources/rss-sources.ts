@@ -1,6 +1,6 @@
 export type RssSource = {
   id: string
-  company: 'OpenAI' | 'Anthropic' | 'Google' | 'Meta' | 'xAI' | 'NVIDIA'
+  company: 'OpenAI' | 'Anthropic' | 'Google' | 'Meta' | 'xAI' | 'NVIDIA' | 'Independent'
   name: string
   urls: string[]
 }

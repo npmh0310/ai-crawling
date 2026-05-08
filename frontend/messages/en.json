@@ -35,9 +35,12 @@
   },
   "neuralFeed": {
     "title": "Intelligence Aggregator",
+    "subtitle": "Real-time updates from OpenAI, Google, Meta, NVIDIA, Anthropic, Mistral, and xAI",
+    "live": "Live",
     "activeMonitoring": "Active Monitoring",
     "streamConfiguration": "Stream Configuration",
-    "resetFilters": "Reset Filters",
+    "resetFilters": "Reset",
+    "applyFilters": "Apply",
     "sources": "Sources",
     "sourceAll": "All",
     "sourceNews": "News",
@@ -46,7 +49,12 @@
     "intelligenceBrief": "Intelligence Brief",
     "keyTakeaways": "Key Takeaways",
     "tags": "Tags",
-    "addToWorkspace": "Add to Workspace"
+    "addToWorkspace": "Add to Workspace",
+    "sortedByRecent": "Sorted by most recent",
+    "lastCrawl": "Last crawl",
+    "itemsCollected": "items collected",
+    "sources": "sources",
+    "nextCrawl": "Next crawl"
   },
   "locale": {
     "switchLanguage": "Switch language",

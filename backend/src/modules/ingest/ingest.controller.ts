@@ -3,6 +3,7 @@ import { FetchRssQueryDto } from './dto/fetch-rss-query.dto'
 import { RSS_SOURCES } from '../sources/rss-sources'
 import { RssService } from './rss.service'
 import { ArticleService } from './article.service'
+import { TwitterService } from './twitter.service'
 
 @Controller('ingest')
 export class IngestController {
@@ -11,6 +12,7 @@ export class IngestController {
   constructor(
     private readonly rssService: RssService,
     private readonly articleService: ArticleService,
+    private readonly twitterService: TwitterService,
   ) {}
 
   @Get('openai')
@@ -67,5 +69,27 @@ export class IngestController {
       this.logger.error(`ingestSource(${sourceId}) failed: ${err.message}`),
     )
     return { message: `Ingest started for ${sourceId} — check server logs for progress` }
+  }
+
+  @Get('twitter/run')
+  ingestAllTwitter() {
+    this.twitterService.ingestAll().catch((err) =>
+      this.logger.error(`Twitter ingestAll failed: ${err.message}`),
+    )
+    return { message: 'Twitter ingest started' }
+  }
+
+  @Get('twitter/run/:handle')
+  ingestTwitterAccount(@Param('handle') handle: string) {
+    const sourceId = `twitter-${handle.toLowerCase()}`
+    this.twitterService.ingestAccount(sourceId).catch((err) =>
+      this.logger.error(`Twitter ingestAccount(@${handle}) failed: ${err.message}`),
+    )
+    return { message: `Twitter ingest started for @${handle}` }
+  }
+
+  @Get('twitter/preview/:handle')
+  previewTwitterAccount(@Param('handle') handle: string) {
+    return this.twitterService.previewAccount(handle)
   }
 }

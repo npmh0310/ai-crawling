@@ -35,9 +35,12 @@
   },
   "neuralFeed": {
     "title": "Tổng hợp thông tin",
+    "subtitle": "Cập nhật thời gian thực từ OpenAI, Google, Meta, NVIDIA, Anthropic, Mistral và xAI",
+    "live": "Trực tiếp",
     "activeMonitoring": "Đang theo dõi",
     "streamConfiguration": "Cấu hình luồng",
-    "resetFilters": "Đặt lại bộ lọc",
+    "resetFilters": "Đặt lại",
+    "applyFilters": "Áp dụng",
     "sources": "Nguồn",
     "sourceAll": "Tất cả",
     "sourceNews": "Tin tức",
@@ -46,7 +49,12 @@
     "intelligenceBrief": "Tóm tắt thông tin",
     "keyTakeaways": "Điểm chính",
     "tags": "Thẻ",
-    "addToWorkspace": "Thêm vào workspace"
+    "addToWorkspace": "Thêm vào workspace",
+    "sortedByRecent": "Sắp xếp theo mới nhất",
+    "lastCrawl": "Lần cào gần nhất",
+    "itemsCollected": "bài thu thập",
+    "sources": "nguồn",
+    "nextCrawl": "Lần cào tiếp theo"
   },
   "locale": {
     "switchLanguage": "Chuyển ngôn ngữ",

@@ -14,7 +14,7 @@ export class FeedService {
     const skip = (page - 1) * take
 
     const where = {
-      ...(company && { company: company as any }),
+      ...(company?.length && { company: { in: company as any } }),
       ...(sourceType && { sourceType: sourceType as any }),
       ...(category && { category }),
       ...(unreadOnly && { isRead: false }),
@@ -60,6 +60,25 @@ export class FeedService {
     const item = await this.prisma.feedItem.findUnique({ where: { id } })
     if (!item) throw new NotFoundException(`Feed item not found`)
     await this.prisma.feedItem.update({ where: { id }, data: { isRead: true } })
+  }
+
+  async getCrawlStats() {
+    const latest = await this.prisma.crawlLog.findFirst({
+      orderBy: { startedAt: 'desc' },
+    })
+
+    if (!latest) return { all: 0, news: 0, social: 0, sourcesCount: 0, lastCrawledAt: null }
+
+    const sessionWindow = new Date(latest.startedAt.getTime() - 30 * 60 * 1000)
+
+    const [sourcesCount, all, news, social] = await Promise.all([
+      this.prisma.crawlLog.count({ where: { startedAt: { gte: sessionWindow } } }),
+      this.prisma.feedItem.count({ where: { createdAt: { gte: sessionWindow } } }),
+      this.prisma.feedItem.count({ where: { createdAt: { gte: sessionWindow }, sourceType: 'news' } }),
+      this.prisma.feedItem.count({ where: { createdAt: { gte: sessionWindow }, sourceType: 'social' } }),
+    ])
+
+    return { all, news, social, sourcesCount, lastCrawledAt: latest.finishedAt ?? latest.startedAt }
   }
 
   async markAllAsRead() {

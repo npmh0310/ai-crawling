@@ -6,8 +6,16 @@ import { FEED_ENDPOINTS } from "../constants/endpoints"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
+export type CrawlStats = {
+  all: number
+  news: number
+  social: number
+  sourcesCount: number
+  lastCrawledAt: string | null
+}
+
 export type FeedQuery = {
-  company?: string
+  company?: string[]
   sourceType?: "news" | "social"
   category?: string
   unreadOnly?: boolean
@@ -20,10 +28,13 @@ type InfiniteFeedQuery = Omit<FeedQuery, "page" | "take">
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-function buildQueryString(params: Record<string, string | number | boolean | undefined>): string {
+function buildQueryString(params: Record<string, string | string[] | number | boolean | undefined>): string {
   const search = new URLSearchParams()
   for (const [key, value] of Object.entries(params)) {
-    if (value !== undefined && value !== "" && value !== false) {
+    if (value === undefined || value === "" || value === false) continue
+    if (key === "company" && Array.isArray(value)) {
+      value.forEach((v) => search.append("company", v))
+    } else {
       search.set(key, String(value))
     }
   }
@@ -48,6 +59,9 @@ export const feedApiService = {
 
   markAllRead: () =>
     api.patch<{ updated: number }>(FEED_ENDPOINTS.readAll),
+
+  getCrawlStats: () =>
+    api.get<CrawlStats>(FEED_ENDPOINTS.crawlStats),
 }
 
 // ─── Query keys ───────────────────────────────────────────────────────────────
@@ -80,5 +94,11 @@ export const feedQueryKeys = {
       queryKey: [...feedQueryKeys.all, "detail", id],
       queryFn: () => feedApiService.getFeedById(id),
       enabled: Boolean(id),
+    }),
+  crawlStats: () =>
+    queryOptions({
+      queryKey: [...feedQueryKeys.all, "crawl-stats"],
+      queryFn: () => feedApiService.getCrawlStats(),
+      staleTime: 5 * 60 * 1000,
     }),
 }

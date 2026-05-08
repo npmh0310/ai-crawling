@@ -1,4 +1,4 @@
-import { IsBoolean, IsEnum, IsInt, IsOptional, IsString, Max, Min } from 'class-validator'
+import { IsArray, IsBoolean, IsEnum, IsInt, IsOptional, IsString, Max, Min } from 'class-validator'
 import { Transform, Type } from 'class-transformer'
 
 export enum LangParam {
@@ -23,8 +23,10 @@ export enum SourceTypeFilter {
 
 export class FeedQueryDto {
   @IsOptional()
-  @IsEnum(CompanyFilter)
-  company?: CompanyFilter
+  @Transform(({ value }) => (Array.isArray(value) ? value : [value]))
+  @IsArray()
+  @IsEnum(CompanyFilter, { each: true })
+  company?: CompanyFilter[]
 
   @IsOptional()
   @IsEnum(SourceTypeFilter)

@@ -55,8 +55,12 @@ export class AiProcessorService {
   )
 
   async analyze(title: string, content: string, company: string): Promise<AiAnalysisResult> {
+    const prompt = buildAnalyzePrompt(title, content, company)
+    return this.runAnalysis(prompt, title)
+  }
+
+  private async runAnalysis(prompt: string, label: string): Promise<AiAnalysisResult> {
     try {
-      const prompt = buildAnalyzePrompt(title, content, company)
       const result = await this.model.generateContent(prompt)
       const text = result.response.text().trim()
 
@@ -73,7 +77,7 @@ export class AiProcessorService {
         : 'general'
 
       if (isPromptEcho(parsed.takeaways_en) || isPromptEcho(parsed.takeaways_vi)) {
-        this.logger.warn(`AI returned prompt template verbatim for "${title}" — using fallback`)
+        this.logger.warn(`AI returned prompt template verbatim for "${label}" — using fallback`)
         return FALLBACK
       }
 
@@ -90,7 +94,7 @@ export class AiProcessorService {
         tags: Array.isArray(parsed.tags) ? parsed.tags.slice(0, CONFIG.ai.maxTags) : [],
       }
     } catch (err) {
-      this.logger.warn(`AI analysis failed for "${title}": ${(err as Error).message}`)
+      this.logger.warn(`AI analysis failed for "${label}": ${(err as Error).message}`)
       return FALLBACK
     }
   }

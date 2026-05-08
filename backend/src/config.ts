@@ -25,6 +25,15 @@ export const CONFIG = {
     },
   },
   scheduler: {
-    defaultCron: '0 6,12,18,0 * * *',
+    defaultCron: '0 0,12 * * *',
+  },
+  twitter: {
+    serviceUrl: process.env.TWITTER_SERVICE_URL ?? 'http://localhost:3010',
+    cronSchedule: process.env.TWITTER_CRON_SCHEDULE ?? '0 0,12 * * *',
+    concurrency: 2,
+    filter: {
+      minBodyLength: 100,
+      maxPerCrawl: 5,
+    },
   },
 }
