@@ -1,0 +1,64 @@
+{
+  "app": {
+    "name": "AI Crawling"
+  },
+  "navigation": {
+    "mainStream": "Luồng chính",
+    "neuralFeed": "Tin tức AI",
+    "flashAlerts": "Cảnh báo nhanh",
+    "research": "Nghiên cứu",
+    "settings": "Cài đặt",
+    "getHelp": "Trợ giúp",
+    "savedIntel": "Tin đã lưu",
+    "computeTrends": "Xu hướng công nghệ"
+  },
+  "documents": {
+    "title": "Bộ sưu tập",
+    "more": "Xem thêm",
+    "open": "Mở",
+    "share": "Chia sẻ",
+    "delete": "Xóa"
+  },
+  "user": {
+    "account": "Tài khoản",
+    "billing": "Thanh toán",
+    "notifications": "Thông báo",
+    "logout": "Đăng xuất"
+  },
+  "header": {
+    "documents": "Tài liệu",
+    "searchPlaceholder": "Tìm kiếm thông tin, thực thể hoặc hashtag...",
+    "searchPages": "Trang",
+    "searchNoResults": "Không tìm thấy kết quả.",
+    "searchGoToPage": "Đi đến trang",
+    "searchOpenDetail": "Xem chi tiết"
+  },
+  "neuralFeed": {
+    "title": "Tổng hợp thông tin",
+    "subtitle": "Cập nhật thời gian thực từ OpenAI, Google, Meta, NVIDIA, Anthropic, Mistral, xAI và cộng đồng AI trên Reddit",
+    "live": "Trực tiếp",
+    "activeMonitoring": "Đang theo dõi",
+    "streamConfiguration": "Cấu hình luồng",
+    "resetFilters": "Đặt lại",
+    "applyFilters": "Áp dụng",
+    "sources": "Nguồn",
+    "sourceAll": "Tất cả",
+    "sourceNews": "Tin tức",
+    "sourceSocial": "Mạng xã hội",
+    "filterByCompany": "Lọc theo công ty",
+    "intelligenceBrief": "Tóm tắt thông tin",
+    "keyTakeaways": "Điểm chính",
+    "tags": "Thẻ",
+    "addToWorkspace": "Thêm vào workspace",
+    "sortedByRecent": "Sắp xếp theo mới nhất",
+    "lastCrawl": "Lần cào gần nhất",
+    "itemsCollected": "bài thu thập",
+    "sources": "nguồn",
+    "nextCrawl": "Lần cào tiếp theo"
+  },
+  "locale": {
+    "switchLanguage": "Chuyển ngôn ngữ",
+    "en": "Tiếng Anh",
+    "vi": "Tiếng Việt"
+  }
+}

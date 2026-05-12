@@ -1,0 +1,64 @@
+{
+  "app": {
+    "name": "AI Crawling"
+  },
+  "navigation": {
+    "mainStream": "Main Stream",
+    "neuralFeed": "Neural Feed",
+    "flashAlerts": "Flash Alerts",
+    "research": "Research",
+    "settings": "Settings",
+    "getHelp": "Get Help",
+    "savedIntel": "Saved Intel",
+    "computeTrends": "Compute Trends"
+  },
+  "documents": {
+    "title": "Collections",
+    "more": "More",
+    "open": "Open",
+    "share": "Share",
+    "delete": "Delete"
+  },
+  "user": {
+    "account": "Account",
+    "billing": "Billing",
+    "notifications": "Notifications",
+    "logout": "Log out"
+  },
+  "header": {
+    "documents": "Documents",
+    "searchPlaceholder": "Search intelligence, entities, or hashtags...",
+    "searchPages": "Pages",
+    "searchNoResults": "No results found.",
+    "searchGoToPage": "Go to Page",
+    "searchOpenDetail": "Open Detail"
+  },
+  "neuralFeed": {
+    "title": "Intelligence Aggregator",
+    "subtitle": "Real-time updates from OpenAI, Google, Meta, NVIDIA, Anthropic, Mistral, xAI, and Reddit AI communities",
+    "live": "Live",
+    "activeMonitoring": "Active Monitoring",
+    "streamConfiguration": "Stream Configuration",
+    "resetFilters": "Reset",
+    "applyFilters": "Apply",
+    "sources": "Sources",
+    "sourceAll": "All",
+    "sourceNews": "News",
+    "sourceSocial": "Social",
+    "filterByCompany": "Filter by Company",
+    "intelligenceBrief": "Intelligence Brief",
+    "keyTakeaways": "Key Takeaways",
+    "tags": "Tags",
+    "addToWorkspace": "Add to Workspace",
+    "sortedByRecent": "Sorted by most recent",
+    "lastCrawl": "Last crawl",
+    "itemsCollected": "items collected",
+    "sources": "sources",
+    "nextCrawl": "Next crawl"
+  },
+  "locale": {
+    "switchLanguage": "Switch language",
+    "en": "English",
+    "vi": "Vietnamese"
+  }
+}
