@@ -25,15 +25,20 @@ export const CONFIG = {
     },
   },
   scheduler: {
-    defaultCron: '0 0,12 * * *',
+    defaultCron: process.env.CRON_SCHEDULE ?? '0 0,12 * * *',
   },
   twitter: {
     serviceUrl: process.env.TWITTER_SERVICE_URL ?? 'http://localhost:3010',
-    cronSchedule: process.env.TWITTER_CRON_SCHEDULE ?? '0 0,12 * * *',
     concurrency: 2,
     filter: {
       minBodyLength: 100,
       maxPerCrawl: 5,
     },
+  },
+  reddit: {
+    concurrency: 2,
+    timeframe: (process.env.REDDIT_TIMEFRAME as 'hour' | 'day' | 'week') ?? 'day',
+    fetchLimit: 50,
+    maxPerCrawl: 8,
   },
 }

@@ -14,6 +14,8 @@ export enum CompanyFilter {
   Mistral = 'Mistral',
   NVIDIA = 'NVIDIA',
   xAI = 'xAI',
+  Independent = 'Independent',
+  Reddit = 'Reddit',
 }
 
 export enum SourceTypeFilter {

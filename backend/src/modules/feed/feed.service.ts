@@ -1,13 +1,27 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
+import { SchedulerRegistry } from '@nestjs/schedule'
 import { PrismaService } from '../../prisma/prisma.service'
 import { FeedQueryDto, LangParam, SearchQueryDto } from './dto/feed-query.dto'
 import { formatTimeAgo } from '../../common/utils/time.util'
+import { JUNK_TITLE_VALUES } from '../../common/utils/content-quality.util'
 import { createPaginatedResponse } from '../../common/responses/api-response.factory'
 import { CONFIG } from '../../config'
 
 @Injectable()
 export class FeedService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly scheduler: SchedulerRegistry,
+  ) {}
+
+  private getNextCrawlAt(): Date | null {
+    let earliest: Date | null = null
+    for (const job of this.scheduler.getCronJobs().values()) {
+      const next = job.nextDate().toJSDate()
+      if (!earliest || next < earliest) earliest = next
+    }
+    return earliest
+  }
 
   async getFeeds(query: FeedQueryDto) {
     const { company, sourceType, category, unreadOnly, lang = LangParam.en, page = 1, take = 10 } = query
@@ -18,6 +32,10 @@ export class FeedService {
       ...(sourceType && { sourceType: sourceType as any }),
       ...(category && { category }),
       ...(unreadOnly && { isRead: false }),
+      NOT: [
+        { title: { in: JUNK_TITLE_VALUES } },
+        { titleVi: { in: JUNK_TITLE_VALUES } },
+      ],
     }
 
     const [items, itemCount] = await Promise.all([
@@ -67,7 +85,8 @@ export class FeedService {
       orderBy: { startedAt: 'desc' },
     })
 
-    if (!latest) return { all: 0, news: 0, social: 0, sourcesCount: 0, lastCrawledAt: null }
+    const nextCrawlAt = this.getNextCrawlAt()
+    if (!latest) return { all: 0, news: 0, social: 0, sourcesCount: 0, lastCrawledAt: null, nextCrawlAt }
 
     const sessionWindow = new Date(latest.startedAt.getTime() - 30 * 60 * 1000)
 
@@ -78,7 +97,14 @@ export class FeedService {
       this.prisma.feedItem.count({ where: { createdAt: { gte: sessionWindow }, sourceType: 'social' } }),
     ])
 
-    return { all, news, social, sourcesCount, lastCrawledAt: latest.finishedAt ?? latest.startedAt }
+    return {
+      all,
+      news,
+      social,
+      sourcesCount,
+      lastCrawledAt: latest.finishedAt ?? latest.startedAt,
+      nextCrawlAt,
+    }
   }
 
   async markAllAsRead() {

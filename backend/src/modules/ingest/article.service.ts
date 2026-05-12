@@ -8,6 +8,7 @@ import { RSS_SOURCES, getRssSource } from '../sources/rss-sources'
 import { CONFIG } from '../../config'
 import { RateLimiter } from '../../common/utils/rate-limiter.util'
 import { withRetry } from '../../common/utils/retry.util'
+import { isUsableTitle } from '../../common/utils/content-quality.util'
 
 export type IngestResult = {
   sourceId: string
@@ -102,7 +103,9 @@ export class ArticleService implements OnModuleInit {
         select: { guid: true },
       })
       const existingSet = new Set(existing.map((e) => e.guid))
-      const newItems = items.filter((i) => !existingSet.has(i.guid))
+      const newItems = items
+        .filter((i) => !existingSet.has(i.guid))
+        .filter((i) => isUsableTitle(i.title))
       skipped = items.length - newItems.length
       this.logger.log(`[${sourceId}] ${items.length} fetched, ${newItems.length} new`)
 

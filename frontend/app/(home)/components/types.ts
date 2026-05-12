@@ -1,5 +1,14 @@
 export type SourceType = "all" | "news" | "social"
-export type Company = "OpenAI" | "Anthropic" | "Google" | "Meta" | "Mistral" | "NVIDIA" | "xAI"
+export type Company =
+  | "OpenAI"
+  | "Anthropic"
+  | "Google"
+  | "Meta"
+  | "Mistral"
+  | "NVIDIA"
+  | "xAI"
+  | "Independent"
+  | "Reddit"
 
 export type FeedItem = {
   id: string
@@ -17,4 +26,14 @@ export type FeedItem = {
   isRead: boolean
 }
 
-export const COMPANIES: Company[] = ["OpenAI", "Anthropic", "Google", "Meta", "Mistral", "NVIDIA", "xAI"]
+export const COMPANIES: Company[] = [
+  "OpenAI",
+  "Anthropic",
+  "Google",
+  "Meta",
+  "Mistral",
+  "NVIDIA",
+  "xAI",
+  "Independent",
+  "Reddit",
+]

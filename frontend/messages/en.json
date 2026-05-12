@@ -35,7 +35,7 @@
   },
   "neuralFeed": {
     "title": "Intelligence Aggregator",
-    "subtitle": "Real-time updates from OpenAI, Google, Meta, NVIDIA, Anthropic, Mistral, and xAI",
+    "subtitle": "Real-time updates from OpenAI, Google, Meta, NVIDIA, Anthropic, Mistral, xAI, and Reddit AI communities",
     "live": "Live",
     "activeMonitoring": "Active Monitoring",
     "streamConfiguration": "Stream Configuration",

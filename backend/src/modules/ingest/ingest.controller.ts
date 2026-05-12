@@ -4,6 +4,8 @@ import { RSS_SOURCES } from '../sources/rss-sources'
 import { RssService } from './rss.service'
 import { ArticleService } from './article.service'
 import { TwitterService } from './twitter.service'
+import { RedditService } from './reddit.service'
+import { REDDIT_SOURCES } from '../sources/reddit-sources'
 
 @Controller('ingest')
 export class IngestController {
@@ -13,6 +15,7 @@ export class IngestController {
     private readonly rssService: RssService,
     private readonly articleService: ArticleService,
     private readonly twitterService: TwitterService,
+    private readonly redditService: RedditService,
   ) {}
 
   @Get('openai')
@@ -91,5 +94,32 @@ export class IngestController {
   @Get('twitter/preview/:handle')
   previewTwitterAccount(@Param('handle') handle: string) {
     return this.twitterService.previewAccount(handle)
+  }
+
+  @Get('reddit/run')
+  ingestAllReddit() {
+    this.redditService.ingestAll().catch((err) =>
+      this.logger.error(`Reddit ingestAll failed: ${err.message}`),
+    )
+    return { message: 'Reddit ingest started' }
+  }
+
+  @Get('reddit/run/:sourceId')
+  ingestRedditSource(@Param('sourceId') sourceId: string) {
+    const resolvedId = sourceId.startsWith('reddit-') ? sourceId : `reddit-${sourceId.toLowerCase()}`
+    this.redditService.ingestSource(resolvedId).catch((err) =>
+      this.logger.error(`Reddit ingestSource(${resolvedId}) failed: ${err.message}`),
+    )
+    return { message: `Reddit ingest started for ${resolvedId}` }
+  }
+
+  @Get('reddit/preview/:subreddit')
+  previewSubreddit(@Param('subreddit') subreddit: string) {
+    return this.redditService.previewSubreddit(subreddit)
+  }
+
+  @Get('reddit/sources')
+  listRedditSources() {
+    return REDDIT_SOURCES
   }
 }

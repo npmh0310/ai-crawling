@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { buildAnalyzePrompt } from './prompts/analyze-article.prompt'
 import { CONFIG } from '../../config'
+import { sanitizeString, sanitizeStringArray } from '../../common/utils/content-quality.util'
 
 export type AiAnalysisResult = {
   category: string
@@ -51,7 +52,7 @@ export class AiProcessorService {
       model: process.env.AI_MODEL ?? CONFIG.ai.defaultModel,
       generationConfig: { responseMimeType: 'application/json' },
     },
-    { timeout: 60000 },
+    { timeout: 120000 },
   )
 
   async analyze(title: string, content: string, company: string): Promise<AiAnalysisResult> {
@@ -81,18 +82,20 @@ export class AiProcessorService {
         return FALLBACK
       }
 
-      return {
-        category,
-        titleVi: typeof parsed.title_vi === 'string' ? parsed.title_vi : '',
-        bodyVi: typeof parsed.body_vi === 'string' ? parsed.body_vi.slice(0, 1000) : '',
-        takeaways: Array.isArray(parsed.takeaways_en)
-          ? parsed.takeaways_en.slice(0, CONFIG.ai.maxTakeaways)
-          : [],
-        takeawaysVi: Array.isArray(parsed.takeaways_vi)
-          ? parsed.takeaways_vi.slice(0, CONFIG.ai.maxTakeaways)
-          : [],
-        tags: Array.isArray(parsed.tags) ? parsed.tags.slice(0, CONFIG.ai.maxTags) : [],
+      const titleVi = sanitizeString(parsed.title_vi)
+      const bodyVi = sanitizeString(parsed.body_vi, CONFIG.ai.maxBodyChars)
+      const takeaways = sanitizeStringArray(parsed.takeaways_en, CONFIG.ai.maxTakeaways)
+      const takeawaysVi = sanitizeStringArray(parsed.takeaways_vi, CONFIG.ai.maxTakeaways)
+      const tags = sanitizeStringArray(parsed.tags, CONFIG.ai.maxTags)
+
+      const mostlyEmpty =
+        !bodyVi && takeaways.length === 0 && takeawaysVi.length === 0 && tags.length === 0
+      if (mostlyEmpty) {
+        this.logger.warn(`AI returned mostly junk for "${label}" — using fallback`)
+        return FALLBACK
       }
+
+      return { category, titleVi, bodyVi, takeaways, takeawaysVi, tags }
     } catch (err) {
       this.logger.warn(`AI analysis failed for "${label}": ${(err as Error).message}`)
       return FALLBACK

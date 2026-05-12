@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useRef } from "react"
-import { BirdIcon, GlobeIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { FeedItem } from "./types"
@@ -12,6 +11,14 @@ type Props = {
   hasNextPage?: boolean
   isFetchingNextPage?: boolean
   onLoadMore?: () => void
+}
+
+const SVG_CDN = "https://cdn.jsdelivr.net/gh/glincker/thesvg@main/public/icons"
+
+function getSourceIcon(item: FeedItem): string {
+  if (item.sourceType === "news") return `${SVG_CDN}/rss/default.svg`
+  if (item.company === "Reddit") return `${SVG_CDN}/reddit/default.svg`
+  return `${SVG_CDN}/x/default.svg`
 }
 
 export function FeedList({ items, onItemClick, hasNextPage, isFetchingNextPage, onLoadMore }: Props) {
@@ -36,8 +43,17 @@ export function FeedList({ items, onItemClick, hasNextPage, isFetchingNextPage, 
           onClick={() => onItemClick(item)}
           className={cn("flex cursor-pointer items-start gap-4 px-4 py-4 transition-colors hover:bg-muted/50", i > 0 && "border-t")}
         >
-          <div className="mt-0.5 shrink-0 text-muted-foreground">
-            {item.sourceType === "social" ? <BirdIcon className="size-4" /> : <GlobeIcon className="size-4" />}
+          <div className="mt-0.5 shrink-0">
+            <img
+              src={getSourceIcon(item)}
+              alt=""
+              width={16}
+              height={16}
+              loading="lazy"
+              decoding="async"
+              referrerPolicy="no-referrer"
+              className="size-4"
+            />
           </div>
           <div className="min-w-0 flex-1">
             <div className="mb-1 flex items-center justify-between gap-2">

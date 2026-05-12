@@ -8,6 +8,7 @@ import { CONFIG } from '../../config'
 import { RateLimiter } from '../../common/utils/rate-limiter.util'
 import { withRetry } from '../../common/utils/retry.util'
 import { IngestResult } from './article.service'
+import { isUsableTitle } from '../../common/utils/content-quality.util'
 
 @Injectable()
 export class TwitterService implements OnModuleInit {
@@ -92,6 +93,7 @@ export class TwitterService implements OnModuleInit {
       const newTweets = tweets
         .filter((t) => !existingSet.has(`tweet-${t.id}`))
         .filter((t) => !this.isRepost(t.text))
+        .filter((t) => isUsableTitle(t.text))
         .filter((t) => this.extractBody(t.text).length >= CONFIG.twitter.filter.minBodyLength)
         .slice(0, CONFIG.twitter.filter.maxPerCrawl)
       skipped = tweets.length - newTweets.length

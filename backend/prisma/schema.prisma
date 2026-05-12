@@ -12,6 +12,7 @@ model FeedSource {
   name          String
   rssUrl        String?      @map("rss_url")
   twitterHandle String?      @unique @map("twitter_handle")
+  subreddit     String?      @unique
   isActive      Boolean      @default(true) @map("is_active")
   createdAt     DateTime     @default(now()) @map("created_at")
   crawlLogs     CrawlLog[]
@@ -80,6 +81,7 @@ enum Company {
   NVIDIA
   xAI
   Independent
+  Reddit
 }
 
 enum SourceType {

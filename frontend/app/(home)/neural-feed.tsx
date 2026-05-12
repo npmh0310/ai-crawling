@@ -14,6 +14,21 @@ import { type Company, type FeedItem, type SourceType } from "./components/types
 import { feedQueryKeys } from "./services/feed"
 
 // =============================================================================
+// Helpers
+// =============================================================================
+
+function dedupeById(items: FeedItem[]): FeedItem[] {
+  const seen = new Set<string>()
+  const out: FeedItem[] = []
+  for (const item of items) {
+    if (seen.has(item.id)) continue
+    seen.add(item.id)
+    out.push(item)
+  }
+  return out
+}
+
+// =============================================================================
 // Component
 // =============================================================================
 
@@ -67,7 +82,7 @@ export function NeuralFeed() {
   }
 
   // ── Derived state ──────────────────────────────────────────────────────────
-  const items = data?.pages.flatMap((p) => p.data ?? []) ?? []
+  const items = dedupeById(data?.pages.flatMap((p) => p.data ?? []) ?? [])
 
   // ── Early returns ──────────────────────────────────────────────────────────
   if (isLoading) {
