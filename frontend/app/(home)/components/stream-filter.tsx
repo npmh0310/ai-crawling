@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { ChevronDownIcon, RotateCcwIcon } from "lucide-react"
+import { ChevronDownIcon, EyeOffIcon, RotateCcwIcon } from "lucide-react"
 import { useTranslations } from "next-intl"
 
 import {
@@ -21,8 +21,10 @@ import { COMPANIES, Company, SourceType } from "./types"
 type Props = {
   sourceFilter: SourceType
   activeCompanies: Company[]
+  unreadOnly: boolean
   onSourceChange: (source: SourceType) => void
   onApply: (companies: Company[]) => void
+  onUnreadToggle: (next: boolean) => void
   onReset: () => void
 }
 
@@ -40,7 +42,15 @@ const SOURCE_OPTIONS: { value: SourceType; labelKey: "sourceAll" | "sourceNews" 
 // Component
 // =============================================================================
 
-export function StreamFilter({ sourceFilter, activeCompanies, onSourceChange, onApply, onReset }: Props) {
+export function StreamFilter({
+  sourceFilter,
+  activeCompanies,
+  unreadOnly,
+  onSourceChange,
+  onApply,
+  onUnreadToggle,
+  onReset,
+}: Props) {
   const t = useTranslations("neuralFeed")
 
   // ── Hooks ──────────────────────────────────────────────────────────────────
@@ -70,7 +80,7 @@ export function StreamFilter({ sourceFilter, activeCompanies, onSourceChange, on
   }
 
   // ── Derived state ──────────────────────────────────────────────────────────
-  const hasActiveFilters = sourceFilter !== "all" || activeCompanies.length > 0
+  const hasActiveFilters = sourceFilter !== "all" || activeCompanies.length > 0 || unreadOnly
 
   // ── JSX ────────────────────────────────────────────────────────────────────
   return (
@@ -144,6 +154,20 @@ export function StreamFilter({ sourceFilter, activeCompanies, onSourceChange, on
             </div>
           </DropdownMenuContent>
         </DropdownMenu>
+
+        {/* Unread toggle */}
+        <button
+          onClick={() => onUnreadToggle(!unreadOnly)}
+          className={cn(
+            "flex h-8 shrink-0 items-center gap-1.5 rounded-md border px-3 text-xs font-medium transition-colors",
+            unreadOnly
+              ? "border-foreground bg-foreground text-background"
+              : "border-border bg-transparent text-muted-foreground hover:border-foreground/40 hover:text-foreground"
+          )}
+        >
+          <EyeOffIcon className="size-3" />
+          {t("unreadOnly")}
+        </button>
 
         {/* Reset — only when active */}
         {hasActiveFilters && (
