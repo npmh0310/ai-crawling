@@ -3,9 +3,7 @@
 import * as React from "react"
 import { useTranslations } from "next-intl"
 
-import { NavDocuments } from "@/components/layouts/navigation/nav-documents"
 import { NavMain } from "@/components/layouts/navigation/nav-main"
-import { NavSecondary } from "@/components/layouts/navigation/nav-secondary"
 import { NavUser } from "@/components/layouts/navigation/nav-user"
 import {
   Sidebar,
@@ -17,13 +15,9 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import {
-  BookmarkIcon,
   BookOpenIcon,
-  CircleHelpIcon,
   CommandIcon,
-  CpuIcon,
   LayoutDashboardIcon,
-  Settings2Icon,
   ZapIcon,
 } from "lucide-react"
 
@@ -55,32 +49,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     },
   ]
 
-  const navSecondary = [
-    {
-      title: t("settings"),
-      url: "#",
-      icon: <Settings2Icon />,
-    },
-    {
-      title: t("getHelp"),
-      url: "#",
-      icon: <CircleHelpIcon />,
-    },
-  ]
-
-  const documents = [
-    {
-      name: t("savedIntel"),
-      url: "#",
-      icon: <BookmarkIcon />,
-    },
-    {
-      name: t("computeTrends"),
-      url: "#",
-      icon: <CpuIcon />,
-    },
-  ]
-
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader className="h-(--header-height)">
@@ -98,8 +66,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={navMain} label={t("mainStream")} />
-        <NavDocuments items={documents} />
-        <NavSecondary items={navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={user} />

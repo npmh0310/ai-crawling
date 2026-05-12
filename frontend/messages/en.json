@@ -28,6 +28,7 @@
   "header": {
     "documents": "Documents",
     "searchPlaceholder": "Search intelligence, entities, or hashtags...",
+    "searchPlaceholderShort": "Search...",
     "searchPages": "Pages",
     "searchNoResults": "No results found.",
     "searchGoToPage": "Go to Page",
@@ -41,7 +42,6 @@
     "streamConfiguration": "Stream Configuration",
     "resetFilters": "Reset",
     "applyFilters": "Apply",
-    "sources": "Sources",
     "sourceAll": "All",
     "sourceNews": "News",
     "sourceSocial": "Social",
@@ -54,7 +54,23 @@
     "lastCrawl": "Last crawl",
     "itemsCollected": "items collected",
     "sources": "sources",
-    "nextCrawl": "Next crawl"
+    "nextCrawl": "Next crawl",
+    "markAllRead": "Mark all as read",
+    "markedAllRead": "Marked {count} items as read",
+    "markAllReadFailed": "Failed to mark all as read",
+    "emptyTitle": "No intelligence yet",
+    "emptyHint": "Try adjusting filters or wait for the next crawl"
+  },
+  "flashAlerts": {
+    "title": "Flash Alerts",
+    "subtitle": "Real-time social signals from AI labs and communities"
+  },
+  "research": {
+    "title": "Research",
+    "subtitle": "Papers, studies, and research announcements from AI labs"
+  },
+  "common": {
+    "comingSoon": "Coming soon"
   },
   "locale": {
     "switchLanguage": "Switch language",

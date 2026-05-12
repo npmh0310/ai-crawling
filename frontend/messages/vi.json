@@ -28,6 +28,7 @@
   "header": {
     "documents": "Tài liệu",
     "searchPlaceholder": "Tìm kiếm thông tin, thực thể hoặc hashtag...",
+    "searchPlaceholderShort": "Tìm kiếm...",
     "searchPages": "Trang",
     "searchNoResults": "Không tìm thấy kết quả.",
     "searchGoToPage": "Đi đến trang",
@@ -41,7 +42,6 @@
     "streamConfiguration": "Cấu hình luồng",
     "resetFilters": "Đặt lại",
     "applyFilters": "Áp dụng",
-    "sources": "Nguồn",
     "sourceAll": "Tất cả",
     "sourceNews": "Tin tức",
     "sourceSocial": "Mạng xã hội",
@@ -54,7 +54,23 @@
     "lastCrawl": "Lần cào gần nhất",
     "itemsCollected": "bài thu thập",
     "sources": "nguồn",
-    "nextCrawl": "Lần cào tiếp theo"
+    "nextCrawl": "Lần cào tiếp theo",
+    "markAllRead": "Đánh dấu đã đọc tất cả",
+    "markedAllRead": "Đã đánh dấu {count} bài là đã đọc",
+    "markAllReadFailed": "Không thể đánh dấu đã đọc tất cả",
+    "emptyTitle": "Chưa có thông tin nào",
+    "emptyHint": "Thử điều chỉnh bộ lọc hoặc đợi lần cào tiếp theo"
+  },
+  "flashAlerts": {
+    "title": "Cảnh báo nhanh",
+    "subtitle": "Tín hiệu mạng xã hội thời gian thực từ các phòng lab và cộng đồng AI"
+  },
+  "research": {
+    "title": "Nghiên cứu",
+    "subtitle": "Bài báo, nghiên cứu và công bố khoa học từ các phòng lab AI"
+  },
+  "common": {
+    "comingSoon": "Sắp ra mắt"
   },
   "locale": {
     "switchLanguage": "Chuyển ngôn ngữ",

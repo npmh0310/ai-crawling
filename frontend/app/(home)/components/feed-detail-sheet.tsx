@@ -1,12 +1,14 @@
 "use client"
 
+import { useEffect, useRef } from "react"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { ExternalLinkIcon, HashIcon, ZapIcon } from "lucide-react"
 import { useTranslations } from "next-intl"
 
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Sheet, SheetContent, SheetHeader } from "@/components/ui/sheet"
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 
+import { feedApiService, feedQueryKeys } from "../services/feed"
 import { FeedItem } from "./types"
 
 type Props = {
@@ -17,16 +19,36 @@ type Props = {
 
 export function FeedDetailSheet({ item, open, onOpenChange }: Props) {
   const t = useTranslations("neuralFeed")
+  const queryClient = useQueryClient()
+  const markedIdsRef = useRef<Set<string>>(new Set())
+
+  const markReadMutation = useMutation({
+    mutationFn: (id: string) => feedApiService.markFeedRead(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: feedQueryKeys.lists() })
+    },
+  })
+
+  useEffect(() => {
+    if (!open || !item || item.isRead) return
+    if (markedIdsRef.current.has(item.id)) return
+    markedIdsRef.current.add(item.id)
+    markReadMutation.mutate(item.id)
+  }, [open, item, markReadMutation])
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="right" showCloseButton={false} className="flex w-80 flex-col gap-0 p-0 sm:max-w-80">
+      <SheetContent
+        side="right"
+        showCloseButton={false}
+        className="flex w-full flex-col gap-0 p-0 sm:w-80 sm:max-w-80"
+      >
         {item && (
           <>
             <SheetHeader className="flex-row h-18 items-center justify-between border-b px-4 py-3 gap-0">
-              <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+              <SheetTitle className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
                 {t("intelligenceBrief")}
-              </span>
+              </SheetTitle>
               {item.originalUrl && (
                 <a
                   href={item.originalUrl}
@@ -93,12 +115,6 @@ export function FeedDetailSheet({ item, open, onOpenChange }: Props) {
                   </div>
                 </div>
               )}
-            </div>
-
-            <div className="border-t p-4">
-              <Button className="w-full" size="lg">
-                {t("addToWorkspace")}
-              </Button>
             </div>
           </>
         )}

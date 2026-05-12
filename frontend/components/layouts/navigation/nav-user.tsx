@@ -34,6 +34,7 @@ export function NavUser({
   }
 }) {
   const t = useTranslations("user")
+  const tCommon = useTranslations("common")
   const { isMobile } = useSidebar()
 
   return (
@@ -81,23 +82,27 @@ export function NavUser({
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
+              <DropdownMenuItem disabled>
                 <CircleUserRoundIcon />
                 {t("account")}
+                <span className="ml-auto text-[10px] uppercase tracking-wide text-muted-foreground">{tCommon("comingSoon")}</span>
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem disabled>
                 <CreditCardIcon />
                 {t("billing")}
+                <span className="ml-auto text-[10px] uppercase tracking-wide text-muted-foreground">{tCommon("comingSoon")}</span>
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem disabled>
                 <BellIcon />
                 {t("notifications")}
+                <span className="ml-auto text-[10px] uppercase tracking-wide text-muted-foreground">{tCommon("comingSoon")}</span>
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem disabled>
               <LogOutIcon />
               {t("logout")}
+              <span className="ml-auto text-[10px] uppercase tracking-wide text-muted-foreground">{tCommon("comingSoon")}</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
