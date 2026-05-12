@@ -1,8 +1,12 @@
 "use client"
 
 import { useEffect, useRef } from "react"
+import { InboxIcon } from "lucide-react"
+import { useTranslations } from "next-intl"
 
+import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
+
 import { FeedItem } from "./types"
 
 type Props = {
@@ -10,10 +14,12 @@ type Props = {
   onItemClick: (item: FeedItem) => void
   hasNextPage?: boolean
   isFetchingNextPage?: boolean
+  isLoading?: boolean
   onLoadMore?: () => void
 }
 
 const SVG_CDN = "https://cdn.jsdelivr.net/gh/glincker/thesvg@main/public/icons"
+const SKELETON_ROWS = 6
 
 function getSourceIcon(item: FeedItem): string {
   if (item.sourceType === "news") return `${SVG_CDN}/rss/default.svg`
@@ -21,7 +27,45 @@ function getSourceIcon(item: FeedItem): string {
   return `${SVG_CDN}/x/default.svg`
 }
 
-export function FeedList({ items, onItemClick, hasNextPage, isFetchingNextPage, onLoadMore }: Props) {
+function FeedListSkeleton() {
+  return (
+    <div className="flex-1 overflow-hidden border-t">
+      {Array.from({ length: SKELETON_ROWS }).map((_, i) => (
+        <div
+          key={i}
+          className={cn("flex items-start gap-4 px-4 py-4 sm:px-6", i > 0 && "border-t")}
+        >
+          <Skeleton className="mt-0.5 size-4 shrink-0 rounded" />
+          <div className="min-w-0 flex-1 space-y-2">
+            <Skeleton className="h-3 w-40" />
+            <Skeleton className="h-4 w-3/4" />
+            <Skeleton className="h-3 w-full" />
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function FeedListEmpty() {
+  const t = useTranslations("neuralFeed")
+  return (
+    <div className="flex flex-1 flex-col items-center justify-center gap-2 border-t px-6 py-16 text-center">
+      <InboxIcon className="size-8 text-muted-foreground" />
+      <p className="text-sm font-medium">{t("emptyTitle")}</p>
+      <p className="text-xs text-muted-foreground">{t("emptyHint")}</p>
+    </div>
+  )
+}
+
+export function FeedList({
+  items,
+  onItemClick,
+  hasNextPage,
+  isFetchingNextPage,
+  isLoading,
+  onLoadMore,
+}: Props) {
   const sentinelRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -35,13 +79,20 @@ export function FeedList({ items, onItemClick, hasNextPage, isFetchingNextPage, 
     return () => { if (el) observer.unobserve(el) }
   }, [onLoadMore, hasNextPage])
 
+  if (isLoading) return <FeedListSkeleton />
+  if (items.length === 0) return <FeedListEmpty />
+
   return (
     <div className="flex-1 overflow-y-auto border-t">
       {items.map((item, i) => (
         <div
           key={item.id}
           onClick={() => onItemClick(item)}
-          className={cn("flex cursor-pointer items-start gap-4 px-4 py-4 transition-colors hover:bg-muted/50", i > 0 && "border-t")}
+          className={cn(
+            "flex cursor-pointer items-start gap-4 px-4 py-4 transition-colors hover:bg-muted/50 sm:px-6",
+            i > 0 && "border-t",
+            item.isRead && "opacity-60",
+          )}
         >
           <div className="mt-0.5 shrink-0">
             <img
@@ -64,7 +115,7 @@ export function FeedList({ items, onItemClick, hasNextPage, isFetchingNextPage, 
               </div>
               {item.handle && <span className="text-xs text-muted-foreground">{item.handle}</span>}
             </div>
-            <p className="mb-1 text-sm font-medium">{item.title}</p>
+            <p className={cn("mb-1 text-sm", item.isRead ? "font-normal" : "font-medium")}>{item.title}</p>
             {item.body && <p className="text-sm text-muted-foreground">{item.body}</p>}
             {item.quote && (
               <blockquote className="border-l-2 pl-3 text-sm italic text-muted-foreground">{item.quote}</blockquote>

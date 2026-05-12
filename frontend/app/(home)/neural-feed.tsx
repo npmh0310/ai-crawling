@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useState } from "react"
+import { useCallback, useMemo, useState } from "react"
 import { useInfiniteQuery } from "@tanstack/react-query"
 import { useLocale } from "next-intl"
 import { useRouter, useSearchParams } from "next/navigation"
@@ -12,6 +12,18 @@ import { StreamFilter } from "./components/stream-filter"
 import { type Company, type FeedItem, type SourceType } from "./components/types"
 
 import { feedQueryKeys } from "./services/feed"
+
+// =============================================================================
+// Types
+// =============================================================================
+
+type Props = {
+  defaultSource?: SourceType
+  categoryKeywords?: string[]
+  lockFilters?: boolean
+  titleKey?: string
+  subtitleKey?: string
+}
 
 // =============================================================================
 // Helpers
@@ -28,11 +40,22 @@ function dedupeById(items: FeedItem[]): FeedItem[] {
   return out
 }
 
+function matchesAnyKeyword(value: string, keywords: string[]): boolean {
+  const lower = value.toLowerCase()
+  return keywords.some((k) => lower.includes(k.toLowerCase()))
+}
+
 // =============================================================================
 // Component
 // =============================================================================
 
-export function NeuralFeed() {
+export function NeuralFeed({
+  defaultSource,
+  categoryKeywords,
+  lockFilters = false,
+  titleKey,
+  subtitleKey,
+}: Props) {
   // ── Hooks ──────────────────────────────────────────────────────────────────
   const locale = useLocale()
   const router = useRouter()
@@ -40,7 +63,8 @@ export function NeuralFeed() {
   const [selectedItem, setSelectedItem] = useState<FeedItem | null>(null)
   const [isSheetOpen, setIsSheetOpen] = useState(false)
 
-  const sourceFilter = (searchParams.get("source") as SourceType) ?? "all"
+  const sourceFilter: SourceType =
+    defaultSource ?? ((searchParams.get("source") as SourceType) || "all")
   const activeCompanies = (searchParams.get("company") ?? "")
     .split(",")
     .filter(Boolean) as Company[]
@@ -82,38 +106,41 @@ export function NeuralFeed() {
   }
 
   // ── Derived state ──────────────────────────────────────────────────────────
-  const items = dedupeById(data?.pages.flatMap((p) => p.data ?? []) ?? [])
-
-  // ── Early returns ──────────────────────────────────────────────────────────
-  if (isLoading) {
-    return (
-      <div className="flex h-full items-center justify-center text-muted-foreground">
-        Loading…
-      </div>
-    )
-  }
+  const items = useMemo(() => {
+    const merged = dedupeById(data?.pages.flatMap((p) => p.data ?? []) ?? [])
+    if (!categoryKeywords?.length) return merged
+    return merged.filter((i) => matchesAnyKeyword(i.category ?? "", categoryKeywords))
+  }, [data, categoryKeywords])
 
   // ── JSX ────────────────────────────────────────────────────────────────────
   return (
     <div className="flex h-full flex-col">
-      <IntelligenceHeader sourceFilter={sourceFilter} />
+      <IntelligenceHeader
+        sourceFilter={sourceFilter}
+        titleKey={titleKey}
+        subtitleKey={subtitleKey}
+        showMarkAllRead={!lockFilters}
+      />
 
-      <div className="border-b px-10">
-        <StreamFilter
-          key={activeCompanies.join(",")}
-          sourceFilter={sourceFilter}
-          activeCompanies={activeCompanies}
-          onSourceChange={handleSourceChange}
-          onApply={handleApply}
-          onReset={handleReset}
-        />
-      </div>
+      {!lockFilters && (
+        <div className="border-b px-4 md:px-10">
+          <StreamFilter
+            key={activeCompanies.join(",")}
+            sourceFilter={sourceFilter}
+            activeCompanies={activeCompanies}
+            onSourceChange={handleSourceChange}
+            onApply={handleApply}
+            onReset={handleReset}
+          />
+        </div>
+      )}
 
       <FeedList
         items={items}
         onItemClick={handleItemClick}
         hasNextPage={hasNextPage}
         isFetchingNextPage={isFetchingNextPage}
+        isLoading={isLoading}
         onLoadMore={fetchNextPage}
       />
 

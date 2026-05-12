@@ -12,6 +12,7 @@ export type CrawlStats = {
   social: number
   sourcesCount: number
   lastCrawledAt: string | null
+  nextCrawlAt: string | null
 }
 
 export type FeedQuery = {

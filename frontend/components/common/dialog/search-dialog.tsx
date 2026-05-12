@@ -124,12 +124,13 @@ export function SearchDialog() {
         render={
           <button
             type="button"
-            className="flex flex-1 cursor-pointer items-center gap-2 text-left text-muted-foreground"
+            className="flex min-w-0 flex-1 cursor-pointer items-center gap-2 text-left text-muted-foreground"
           />
         }
       >
         <SearchIcon className="size-4 shrink-0" />
-        <span className="text-sm">{t("searchPlaceholder")}</span>
+        <span className="truncate text-sm sm:hidden">{t("searchPlaceholderShort")}</span>
+        <span className="hidden truncate text-sm sm:inline">{t("searchPlaceholder")}</span>
       </DialogPrimitive.Trigger>
 
       <DialogPrimitive.Portal>
