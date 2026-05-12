@@ -1,0 +1,11 @@
+venv
+__pycache__
+*.pyc
+.env
+.env.*
+!.env.production.example
+cookies.json
+.git
+.gitignore
+.vscode
+.idea

@@ -1,0 +1,14 @@
+node_modules
+dist
+generated
+.env
+.env.*
+!.env.production.example
+*.log
+.git
+.gitignore
+.vscode
+.idea
+coverage
+test
+README.md

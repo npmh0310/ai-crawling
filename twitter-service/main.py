@@ -1,4 +1,5 @@
 import asyncio
+import base64
 import json
 import os
 from contextlib import asynccontextmanager
@@ -11,7 +12,20 @@ from playwright.async_api import async_playwright, BrowserContext
 load_dotenv()
 
 COOKIES_FILE = os.getenv("TWITTER_COOKIES_FILE", "cookies.json")
+COOKIES_B64 = os.getenv("TWITTER_COOKIES_B64", "")
 HEADLESS = os.getenv("HEADLESS", "true").lower() == "true"
+
+
+def _load_cookies():
+    if COOKIES_B64:
+        return json.loads(base64.b64decode(COOKIES_B64))
+    if os.path.exists(COOKIES_FILE):
+        with open(COOKIES_FILE) as f:
+            return json.load(f)
+    raise RuntimeError(
+        f"No cookies available. Set TWITTER_COOKIES_B64 env or place {COOKIES_FILE}. "
+        f"Run: python save_cookies.py"
+    )
 
 _context: Optional[BrowserContext] = None
 _playwright = None
@@ -22,8 +36,7 @@ _browser = None
 async def lifespan(app: FastAPI):
     global _context, _playwright, _browser
 
-    if not os.path.exists(COOKIES_FILE):
-        raise RuntimeError(f"{COOKIES_FILE} not found. Run: python save_cookies.py")
+    cookies = _load_cookies()
 
     _playwright = await async_playwright().start()
     _browser = await _playwright.chromium.launch(
@@ -33,9 +46,6 @@ async def lifespan(app: FastAPI):
             "--no-sandbox",
         ],
     )
-
-    with open(COOKIES_FILE) as f:
-        cookies = json.load(f)
 
     _context = await _browser.new_context(
         user_agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",

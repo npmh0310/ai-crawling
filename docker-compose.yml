@@ -1,0 +1,32 @@
+services:
+  backend:
+    build: ./backend
+    image: ai-crawling-backend:latest
+    container_name: ai-crawling-backend
+    restart: unless-stopped
+    env_file: ./backend/.env.production
+    environment:
+      TWITTER_SERVICE_URL: http://twitter-service:3010
+    ports:
+      - "127.0.0.1:3009:3009"
+    depends_on:
+      - twitter-service
+    networks:
+      - app-net
+
+  twitter-service:
+    build: ./twitter-service
+    image: ai-crawling-twitter:latest
+    container_name: ai-crawling-twitter
+    restart: unless-stopped
+    env_file: ./twitter-service/.env.production
+    volumes:
+      - ./twitter-service/cookies.json:/app/cookies.json:ro
+    expose:
+      - "3010"
+    networks:
+      - app-net
+
+networks:
+  app-net:
+    driver: bridge
