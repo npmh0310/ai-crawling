@@ -18,6 +18,7 @@ import {
   BookOpenIcon,
   CommandIcon,
   LayoutDashboardIcon,
+  ShieldIcon,
   ZapIcon,
 } from "lucide-react"
 
@@ -46,6 +47,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       title: t("research"),
       url: "/research",
       icon: <BookOpenIcon />,
+    },
+    {
+      title: t("admin"),
+      url: "/admin",
+      icon: <ShieldIcon />,
     },
   ]
 

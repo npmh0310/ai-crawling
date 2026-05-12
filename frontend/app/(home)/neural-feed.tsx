@@ -68,6 +68,7 @@ export function NeuralFeed({
   const activeCompanies = (searchParams.get("company") ?? "")
     .split(",")
     .filter(Boolean) as Company[]
+  const unreadOnly = searchParams.get("unread") === "1"
 
   const setParams = useCallback((updates: Record<string, string | null>) => {
     const params = new URLSearchParams(searchParams.toString())
@@ -81,6 +82,7 @@ export function NeuralFeed({
   const feedQuery = {
     ...(activeCompanies.length > 0 && { company: activeCompanies }),
     ...(sourceFilter !== "all" && { sourceType: sourceFilter as "news" | "social" }),
+    ...(unreadOnly && { unreadOnly: true }),
     lang: locale as "en" | "vi",
   }
 
@@ -101,8 +103,12 @@ export function NeuralFeed({
     setParams({ company: companies.join(",") || null })
   }
 
+  function handleUnreadToggle(next: boolean) {
+    setParams({ unread: next ? "1" : null })
+  }
+
   function handleReset() {
-    setParams({ source: null, company: null })
+    setParams({ source: null, company: null, unread: null })
   }
 
   // ── Derived state ──────────────────────────────────────────────────────────
@@ -128,8 +134,10 @@ export function NeuralFeed({
             key={activeCompanies.join(",")}
             sourceFilter={sourceFilter}
             activeCompanies={activeCompanies}
+            unreadOnly={unreadOnly}
             onSourceChange={handleSourceChange}
             onApply={handleApply}
+            onUnreadToggle={handleUnreadToggle}
             onReset={handleReset}
           />
         </div>

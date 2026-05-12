@@ -2,11 +2,12 @@
 
 import { useEffect, useRef } from "react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { ExternalLinkIcon, HashIcon, ZapIcon } from "lucide-react"
+import { CopyIcon, ExternalLinkIcon, HashIcon, ZapIcon } from "lucide-react"
 import { useTranslations } from "next-intl"
 
 import { Badge } from "@/components/ui/badge"
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
+import { toast } from "@/lib/toast"
 
 import { feedApiService, feedQueryKeys } from "../services/feed"
 import { FeedItem } from "./types"
@@ -36,6 +37,16 @@ export function FeedDetailSheet({ item, open, onOpenChange }: Props) {
     markReadMutation.mutate(item.id)
   }, [open, item, markReadMutation])
 
+  async function handleCopyLink() {
+    if (!item?.originalUrl) return
+    try {
+      await navigator.clipboard.writeText(item.originalUrl)
+      toast.success(t("linkCopied"))
+    } catch {
+      toast.error(t("linkCopyFailed"))
+    }
+  }
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
@@ -50,14 +61,27 @@ export function FeedDetailSheet({ item, open, onOpenChange }: Props) {
                 {t("intelligenceBrief")}
               </SheetTitle>
               {item.originalUrl && (
-                <a
-                  href={item.originalUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-muted-foreground transition-colors hover:text-foreground"
-                >
-                  <ExternalLinkIcon className="size-3.5 shrink-0" />
-                </a>
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={handleCopyLink}
+                    aria-label={t("copyLink")}
+                    title={t("copyLink")}
+                    className="text-muted-foreground transition-colors hover:text-foreground"
+                  >
+                    <CopyIcon className="size-3.5 shrink-0" />
+                  </button>
+                  <a
+                    href={item.originalUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={t("openOriginal")}
+                    title={t("openOriginal")}
+                    className="text-muted-foreground transition-colors hover:text-foreground"
+                  >
+                    <ExternalLinkIcon className="size-3.5 shrink-0" />
+                  </a>
+                </div>
               )}
             </SheetHeader>
 
