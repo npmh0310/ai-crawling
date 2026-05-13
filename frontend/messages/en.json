@@ -61,6 +61,7 @@
     "itemsCollected": "items collected",
     "sources": "sources",
     "nextCrawl": "Next crawl",
+    "hotNow": "Hot Now",
     "markAllRead": "Mark all as read",
     "markedAllRead": "Marked {count} items as read",
     "markAllReadFailed": "Failed to mark all as read",

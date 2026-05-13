@@ -1,12 +1,13 @@
 "use client"
 
 import { useCallback, useMemo, useState } from "react"
-import { useInfiniteQuery } from "@tanstack/react-query"
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query"
 import { useLocale } from "next-intl"
 import { useRouter, useSearchParams } from "next/navigation"
 
 import { FeedDetailSheet } from "./components/feed-detail-sheet"
 import { FeedList } from "./components/feed-list"
+import { HotNowStrip } from "./components/hot-now-strip"
 import { IntelligenceHeader } from "./components/intelligence-header"
 import { StreamFilter } from "./components/stream-filter"
 import { type Company, type FeedItem, type SourceType } from "./components/types"
@@ -89,6 +90,12 @@ export function NeuralFeed({
   const { data, isLoading, isFetchingNextPage, fetchNextPage, hasNextPage } =
     useInfiniteQuery(feedQueryKeys.infinite(feedQuery))
 
+  const showHotStrip = !lockFilters && sourceFilter === "all" && activeCompanies.length === 0 && !unreadOnly
+  const { data: hotData } = useQuery({
+    ...feedQueryKeys.hot(locale, 5),
+    enabled: showHotStrip,
+  })
+
   // ── Handlers ───────────────────────────────────────────────────────────────
   function handleItemClick(item: FeedItem) {
     setSelectedItem(item)
@@ -112,11 +119,17 @@ export function NeuralFeed({
   }
 
   // ── Derived state ──────────────────────────────────────────────────────────
+  const hotIds = useMemo(
+    () => new Set((hotData?.data ?? []).map((i) => i.id)),
+    [hotData],
+  )
+
   const items = useMemo(() => {
     const merged = dedupeById(data?.pages.flatMap((p) => p.data ?? []) ?? [])
-    if (!categoryKeywords?.length) return merged
-    return merged.filter((i) => matchesAnyKeyword(i.category ?? "", categoryKeywords))
-  }, [data, categoryKeywords])
+    const filtered = showHotStrip ? merged.filter((i) => !hotIds.has(i.id)) : merged
+    if (!categoryKeywords?.length) return filtered
+    return filtered.filter((i) => matchesAnyKeyword(i.category ?? "", categoryKeywords))
+  }, [data, categoryKeywords, showHotStrip, hotIds])
 
   // ── JSX ────────────────────────────────────────────────────────────────────
   return (
@@ -127,6 +140,8 @@ export function NeuralFeed({
         subtitleKey={subtitleKey}
         showMarkAllRead={!lockFilters}
       />
+
+      {showHotStrip && <HotNowStrip onItemClick={handleItemClick} />}
 
       {!lockFilters && (
         <div className="border-b px-4 md:px-10">

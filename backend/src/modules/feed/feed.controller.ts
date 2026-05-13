@@ -21,6 +21,12 @@ export class FeedController {
     return this.feedService.searchFeeds(query)
   }
 
+  @Get('hot')
+  getHot(@Query('lang') lang?: LangParam, @Query('limit') limit?: string) {
+    const parsedLimit = limit ? Math.min(20, Math.max(1, Number(limit) || 5)) : 5
+    return this.feedService.getHotItems(lang, parsedLimit)
+  }
+
   @Patch('read-all')
   @HttpCode(200)
   markAllAsRead() {

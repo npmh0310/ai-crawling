@@ -61,6 +61,7 @@
     "itemsCollected": "bài thu thập",
     "sources": "nguồn",
     "nextCrawl": "Lần cào tiếp theo",
+    "hotNow": "Tin nóng",
     "markAllRead": "Đánh dấu đã đọc tất cả",
     "markedAllRead": "Đã đánh dấu {count} bài là đã đọc",
     "markAllReadFailed": "Không thể đánh dấu đã đọc tất cả",

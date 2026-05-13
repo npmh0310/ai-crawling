@@ -6,6 +6,11 @@ import { formatTimeAgo } from '../../common/utils/time.util'
 import { JUNK_TITLE_VALUES } from '../../common/utils/content-quality.util'
 import { createPaginatedResponse } from '../../common/responses/api-response.factory'
 import { CONFIG } from '../../config'
+import { HOT_THRESHOLD, computeHotScore } from './hot-score.util'
+
+const HOT_POOL_DAYS = 7
+const HOT_POOL_CAP = 200
+const HOT_DEFAULT_LIMIT = 5
 
 @Injectable()
 export class FeedService {
@@ -113,6 +118,45 @@ export class FeedService {
       data: { isRead: true },
     })
     return { updated: count }
+  }
+
+  async getHotItems(lang: LangParam = LangParam.en, limit = HOT_DEFAULT_LIMIT) {
+    const since = new Date(Date.now() - HOT_POOL_DAYS * 24 * 3_600_000)
+
+    const candidates = await this.prisma.feedItem.findMany({
+      where: {
+        publishedAt: { gte: since },
+        NOT: [
+          { title: { in: JUNK_TITLE_VALUES } },
+          { titleVi: { in: JUNK_TITLE_VALUES } },
+        ],
+      },
+      orderBy: { publishedAt: 'desc' },
+      take: HOT_POOL_CAP,
+    })
+
+    const now = new Date()
+    const scored = candidates
+      .map((item) => ({
+        item,
+        score: computeHotScore({
+          publishedAt: item.publishedAt,
+          sourceType: item.sourceType,
+          company: item.company,
+          handle: item.handle,
+          category: item.category,
+          title: item.title,
+          takeaways: item.takeaways,
+        }, now),
+      }))
+      .filter((x) => x.score.total >= HOT_THRESHOLD)
+      .sort((a, b) => b.score.total - a.score.total)
+      .slice(0, limit)
+
+    return scored.map(({ item, score }) => ({
+      ...this.toFeedResponse(item, lang),
+      score: score.total,
+    }))
   }
 
   private toFeedResponse(item: any, lang: LangParam) {
