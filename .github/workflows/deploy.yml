@@ -32,6 +32,6 @@ jobs:
             git reset --hard origin/main
             docker compose build backend twitter-service
             docker compose up -d
-            docker compose exec -T backend npx prisma migrate deploy
+            docker compose exec -T backend npx prisma db push --skip-generate
             docker image prune -f
             docker compose ps
