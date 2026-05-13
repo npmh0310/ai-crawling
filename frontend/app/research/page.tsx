@@ -9,12 +9,7 @@ export default function ResearchPage() {
   return (
     <AppShell>
       <Suspense>
-        <NeuralFeed
-          categoryKeywords={RESEARCH_KEYWORDS}
-          lockFilters
-          titleKey="research.title"
-          subtitleKey="research.subtitle"
-        />
+        <NeuralFeed categoryKeywords={RESEARCH_KEYWORDS} lockFilters />
       </Suspense>
     </AppShell>
   )

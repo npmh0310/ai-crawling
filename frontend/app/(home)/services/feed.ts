@@ -45,7 +45,7 @@ function buildQueryString(params: Record<string, string | string[] | number | bo
 
 // ─── Service ──────────────────────────────────────────────────────────────────
 
-export type HotFeedItem = FeedItem & { score: number }
+export type HotFeedItem = FeedItem & { score: number; isHot: boolean }
 
 export const feedApiService = {
   getFeeds: (params?: FeedQuery) =>

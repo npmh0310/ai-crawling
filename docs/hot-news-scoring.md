@@ -1,5 +1,34 @@
 # Hot News Scoring
 
+## ⚡ Cheatsheet (đọc nhanh)
+
+```
+SCORE = Recency(40) + Authority(20) + Keywords(20) + Category(10) + Depth(10)  [max 100]
+
+TIER UI (FE):
+  ≥ 90  → 🚨 BREAKING — card gradient đỏ-cam, text trắng, zap icon pulse
+  ≥ 75  → 🔥 HOT      — border orange-500/60, flame icon pulse, glow shadow
+  ≥ 60  → 🔥 TOP      — card default, badge "Hot Now"
+  <  60 → vẫn xuất hiện nếu < 5 items qualified (fallback fill top-N)
+
+CATEGORY EMOJI (chỉ trong UI):
+  🚀 release/launch/product       💡 breakthrough/research/paper
+  💰 funding/acquisition/invest   📊 benchmark/sota/eval
+  🔧 feature/update                💬 opinion/discussion
+
+POOL: 200 items mới nhất trong 7 ngày, sort score DESC, return top 5
+FILE BE:  backend/src/modules/feed/hot-score.util.ts
+FILE FE:  frontend/app/(home)/components/hot-now-strip.tsx
+ENDPOINT: GET /feed/hot?lang=vi&limit=5
+```
+
+**Constants ở đâu để tune:**
+- Threshold + tier breakpoints: `frontend/app/(home)/components/hot-now-strip.tsx` (`SCORE_BREAKING=90`, `SCORE_HOT=75`)
+- Weights + signal lists: `backend/src/modules/feed/hot-score.util.ts` (`HOT_KEYWORDS`, `FOUNDER_HANDLES`, `CATEGORY_TIER_*`)
+- Pool size + threshold: `backend/src/modules/feed/feed.service.ts` (`HOT_THRESHOLD=60`, `HOT_POOL_DAYS=7`, `HOT_POOL_CAP=200`)
+
+---
+
 ## 1. Mục đích
 
 Feed hiện tại sort theo `publishedAt DESC` — không phân biệt tin "đáng đọc ngay" (Claude 4.7 launch) với tin nhiễu ("@sama: had coffee"). Hot scoring chấm điểm 0-100 cho mỗi `FeedItem` để đẩy 5 tin nóng nhất lên strip "Hot Now" đầu trang chủ.
@@ -170,12 +199,71 @@ takeaways:   [3 items]
 ## 4. Threshold & selection
 
 - **Pool:** 200 items mới nhất trong 7 ngày (`publishedAt >= now - 7d`, order desc, limit 200)
-- **Filter:** `score >= 60`
-- **Sort:** score DESC
-- **Take:** top 5
-- **Edge case:** nếu < 5 qualified → trả ít hơn 5. Nếu 0 → strip ẩn hoàn toàn ở FE.
+- **Sort:** score DESC (luôn rank toàn bộ pool trước)
+- **Selection logic:**
+  - Nếu ≥ `limit` items có `score >= 60` → trả những item qualified đó (genuinely hot)
+  - Ngược lại → fallback trả top N by score bất kể threshold (chống empty state khi slow news day)
+- **Flag:** mỗi item có field `isHot: boolean` (= `score >= 60`) để FE phân biệt badge "🔥 Hot" với "Top of the day"
+- **Edge case:** chỉ trả mảng rỗng nếu pool gốc rỗng (DB không có item trong 7 ngày). FE ẩn strip khi response trống.
 
 > Pool 200 đủ rộng cho ~7 ngày dữ liệu hiện tại (~30-50 items/ngày). Tăng pool nếu DB scale.
+> Quyết định fallback: chấp nhận surface item "không-hẳn-hot" còn hơn strip trống — strip rỗng tạo cảm giác app broken.
+
+---
+
+## 4.5. UI Tier System (FE)
+
+Mỗi item nhận `score` từ BE, FE quy ra 3 tier visual khác nhau để emphasize tin lớn:
+
+### Breakpoints
+
+| Score | Tier | Khi nào trigger |
+|---|---|---|
+| ≥ 90 | **breaking** | Tin lớn nhất ngày: model launch chính chủ < 1h + keywords mạnh + 3 takeaways |
+| ≥ 75 | **hot** | Tin nóng: founder announcement, news official có keyword |
+| 60-74 | **top** | Hot threshold cơ bản |
+| < 60 | **top (fallback)** | Vẫn hiện nếu BE phải fallback fill top-N |
+
+### Visual differentiation
+
+**Tier `breaking` (≥ 90):**
+- Background: `bg-linear-to-br from-red-600 via-orange-500 to-amber-500`
+- Text: `text-white`, body `text-white/85`
+- Border: `border-transparent`
+- Shadow: `shadow-lg shadow-red-500/30`
+- Icon: `ZapIcon` (⚡) + label "BREAKING" + `animate-pulse`
+- Title: `text-xl` (lớn hơn tier khác)
+- Tags: viền trắng `border-white/30`
+
+**Tier `hot` (75-89):**
+- Background: `bg-linear-to-br from-card via-card to-orange-500/15` (orange tint mạnh)
+- Border: `border-orange-500/60`
+- Shadow: `shadow-md shadow-orange-500/10`
+- Icon: `FlameIcon` 🔥 + label "HOT NOW" + **flame pulse animation**
+
+**Tier `top` (60-74):**
+- Background: `bg-linear-to-br from-card via-card to-orange-500/5` (subtle tint)
+- Border: `border` mặc định
+- Shadow: hover only
+- Icon: `FlameIcon` static + label "HOT NOW"
+
+### Category emoji
+
+Map từ `item.category` (lowercase contains):
+
+| Pattern | Emoji |
+|---|---|
+| `release` / `launch` / `product` | 🚀 |
+| `breakthrough` / `research` / `paper` / `study` | 💡 |
+| `funding` / `acquisition` / `invest` | 💰 |
+| `benchmark` / `sota` / `state of the art` / `eval` | 📊 |
+| `feature` / `update` | 🔧 |
+| `opinion` / `discussion` / `thought` | 💬 |
+| (không match) | (không hiện) |
+
+Vị trí: top row của card, ngay sau tier label.
+
+> Thêm emoji mới → edit `getCategoryEmoji()` trong `hot-now-strip.tsx`.
 
 ---
 

@@ -11,6 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { GlobalStatsPill } from "@/components/layouts/global-stats-pill"
 import { cn } from "@/lib/utils"
 import { COMPANIES, Company, SourceType } from "./types"
 
@@ -180,6 +181,9 @@ export function StreamFilter({
           </button>
         )}
       </div>
+
+      {/* Stats — wraps to its own line, centered on mobile; far right on desktop */}
+      <GlobalStatsPill className="order-last w-full justify-center sm:order-0 sm:ml-auto sm:w-auto sm:justify-end" />
     </div>
   )
 }

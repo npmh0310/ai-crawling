@@ -7,12 +7,7 @@ export default function FlashAlertsPage() {
   return (
     <AppShell>
       <Suspense>
-        <NeuralFeed
-          defaultSource="social"
-          lockFilters
-          titleKey="flashAlerts.title"
-          subtitleKey="flashAlerts.subtitle"
-        />
+        <NeuralFeed defaultSource="social" lockFilters />
       </Suspense>
     </AppShell>
   )
