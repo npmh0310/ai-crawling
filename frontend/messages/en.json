@@ -106,7 +106,17 @@
     "new": "New",
     "duration": "Duration",
     "error": "Error",
-    "noCrawlLogs": "No crawl logs yet"
+    "noCrawlLogs": "No crawl logs yet",
+    "logout": "Log out"
+  },
+  "adminLogin": {
+    "title": "Admin Access",
+    "subtitle": "Enter the admin password to continue",
+    "passwordPlaceholder": "Password",
+    "submit": "Sign in",
+    "submitting": "Signing in…",
+    "invalidPassword": "Incorrect password",
+    "serverMisconfigured": "Admin password is not configured on the server"
   },
   "locale": {
     "switchLanguage": "Switch language",

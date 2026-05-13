@@ -1,33 +1,42 @@
 "use client"
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { PowerIcon } from "lucide-react"
 import { useTranslations } from "next-intl"
 
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { toast } from "@/lib/toast"
+import { cn } from "@/lib/utils"
 
-import { adminApiService, adminQueryKeys } from "../services/admin"
+import { type AdminSource, adminApiService, adminQueryKeys } from "../services/admin"
 
 function formatRelative(dateStr: string | null): string {
   if (!dateStr) return "—"
   const diff = Date.now() - new Date(dateStr).getTime()
   const mins = Math.floor(diff / 60_000)
-  if (mins < 1) return "just now"
-  if (mins < 60) return `${mins}m ago`
+  if (mins < 1) return "now"
+  if (mins < 60) return `${mins}m`
   const hrs = Math.floor(mins / 60)
-  if (hrs < 24) return `${hrs}h ago`
-  return `${Math.floor(hrs / 24)}d ago`
+  if (hrs < 24) return `${hrs}h`
+  return `${Math.floor(hrs / 24)}d`
+}
+
+function groupByCompany(sources: AdminSource[]): { company: string; items: AdminSource[] }[] {
+  const map = new Map<string, AdminSource[]>()
+  for (const s of sources) {
+    const arr = map.get(s.company) ?? []
+    arr.push(s)
+    map.set(s.company, arr)
+  }
+  return Array.from(map.entries()).map(([company, items]) => ({ company, items }))
 }
 
 export function SourcesTable() {
+  // ── Hooks ──────────────────────────────────────────────────────────────────
   const t = useTranslations("admin")
   const queryClient = useQueryClient()
 
   const { data, isLoading } = useQuery(adminQueryKeys.sources())
-  const sources = data?.data ?? []
 
   const toggleMutation = useMutation({
     mutationFn: (id: string) => adminApiService.toggleSource(id),
@@ -38,49 +47,67 @@ export function SourcesTable() {
     onError: () => toast.error(t("toggleFailed")),
   })
 
-  if (isLoading) {
-    return <Skeleton className="h-64 w-full rounded-lg" />
-  }
+  // ── Early returns ──────────────────────────────────────────────────────────
+  if (isLoading) return <Skeleton className="h-64 w-full rounded-lg" />
 
+  // ── Derived state ──────────────────────────────────────────────────────────
+  const groups = groupByCompany(data?.data ?? [])
+
+  // ── JSX ────────────────────────────────────────────────────────────────────
   return (
-    <div className="rounded-lg border">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>{t("company")}</TableHead>
-            <TableHead>{t("name")}</TableHead>
-            <TableHead className="text-right">{t("items")}</TableHead>
-            <TableHead>{t("lastSync")}</TableHead>
-            <TableHead>{t("status")}</TableHead>
-            <TableHead className="text-right">{t("actions")}</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {sources.map((s) => (
-            <TableRow key={s.id}>
-              <TableCell className="font-semibold uppercase tracking-wide">{s.company}</TableCell>
-              <TableCell className="text-muted-foreground">{s.name}</TableCell>
-              <TableCell className="text-right tabular-nums">{s.totalItems.toLocaleString()}</TableCell>
-              <TableCell className="text-xs text-muted-foreground">{formatRelative(s.lastSyncAt)}</TableCell>
-              <TableCell>
-                <Badge variant={s.isActive ? "default" : "secondary"}>
-                  {s.isActive ? t("active") : t("inactive")}
-                </Badge>
-              </TableCell>
-              <TableCell className="text-right">
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  disabled={toggleMutation.isPending}
+    <div className="overflow-hidden rounded-lg border">
+      {groups.map((g, gi) => (
+        <div key={g.company} className={cn(gi > 0 && "border-t")}>
+          <div className="flex items-center gap-2 bg-muted/40 px-3 py-1.5">
+            <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+              {g.company}
+            </span>
+            <span className="text-[10px] tabular-nums text-muted-foreground">
+              {g.items.length}
+            </span>
+          </div>
+
+          <ul className="divide-y">
+            {g.items.map((s) => (
+              <li
+                key={s.id}
+                className="flex items-center gap-3 px-3 py-2 text-xs transition-colors hover:bg-muted/30"
+              >
+                <span
+                  aria-hidden
+                  className={cn(
+                    "size-1.5 shrink-0 rounded-full",
+                    s.isActive ? "bg-emerald-500" : "bg-muted-foreground/40",
+                  )}
+                />
+
+                <div className="min-w-0 flex-1 truncate font-medium">{s.name}</div>
+
+                <div className="flex shrink-0 items-center gap-4 tabular-nums text-muted-foreground">
+                  <span className="w-10 text-right">{s.totalItems.toLocaleString()}</span>
+                  <span className="w-8 text-right">{formatRelative(s.lastSyncAt)}</span>
+                </div>
+
+                <button
+                  type="button"
                   onClick={() => toggleMutation.mutate(s.id)}
+                  disabled={toggleMutation.isPending}
+                  aria-label={s.isActive ? t("disable") : t("enable")}
+                  title={s.isActive ? t("disable") : t("enable")}
+                  className={cn(
+                    "flex size-7 shrink-0 items-center justify-center rounded-md transition-colors disabled:opacity-50",
+                    s.isActive
+                      ? "text-foreground hover:bg-muted"
+                      : "text-muted-foreground/60 hover:bg-muted hover:text-foreground",
+                  )}
                 >
-                  {s.isActive ? t("disable") : t("enable")}
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+                  <PowerIcon className="size-3.5" />
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
     </div>
   )
 }
