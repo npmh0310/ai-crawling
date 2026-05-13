@@ -45,12 +45,17 @@ function buildQueryString(params: Record<string, string | string[] | number | bo
 
 // ─── Service ──────────────────────────────────────────────────────────────────
 
+export type HotFeedItem = FeedItem & { score: number }
+
 export const feedApiService = {
   getFeeds: (params?: FeedQuery) =>
     api.get<FeedItem[]>(FEED_ENDPOINTS.list + buildQueryString({ ...params })),
 
   searchFeeds: (q: string, lang?: string, page = 1) =>
     api.get<FeedItem[]>(FEED_ENDPOINTS.search + buildQueryString({ q, lang, page })),
+
+  getHotFeeds: (lang?: string, limit = 5) =>
+    api.get<HotFeedItem[]>(FEED_ENDPOINTS.hot + buildQueryString({ lang, limit })),
 
   getFeedById: (id: string) =>
     api.get<FeedItem>(FEED_ENDPOINTS.detail(id)),
@@ -101,5 +106,11 @@ export const feedQueryKeys = {
       queryKey: [...feedQueryKeys.all, "crawl-stats"],
       queryFn: () => feedApiService.getCrawlStats(),
       staleTime: 5 * 60 * 1000,
+    }),
+  hot: (lang?: string, limit = 5) =>
+    queryOptions({
+      queryKey: [...feedQueryKeys.all, "hot", lang, limit] as const,
+      queryFn: () => feedApiService.getHotFeeds(lang, limit),
+      staleTime: 60_000,
     }),
 }

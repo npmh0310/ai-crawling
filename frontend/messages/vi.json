@@ -61,6 +61,7 @@
     "itemsCollected": "bài thu thập",
     "sources": "nguồn",
     "nextCrawl": "Lần cào tiếp theo",
+    "hotNow": "Tin nóng",
     "markAllRead": "Đánh dấu đã đọc tất cả",
     "markedAllRead": "Đã đánh dấu {count} bài là đã đọc",
     "markAllReadFailed": "Không thể đánh dấu đã đọc tất cả",
@@ -106,7 +107,17 @@
     "new": "Mới",
     "duration": "Thời lượng",
     "error": "Lỗi",
-    "noCrawlLogs": "Chưa có log cào nào"
+    "noCrawlLogs": "Chưa có log cào nào",
+    "logout": "Đăng xuất"
+  },
+  "adminLogin": {
+    "title": "Truy cập quản trị",
+    "subtitle": "Nhập mật khẩu admin để tiếp tục",
+    "passwordPlaceholder": "Mật khẩu",
+    "submit": "Đăng nhập",
+    "submitting": "Đang đăng nhập…",
+    "invalidPassword": "Mật khẩu không đúng",
+    "serverMisconfigured": "Server chưa cấu hình mật khẩu admin"
   },
   "locale": {
     "switchLanguage": "Chuyển ngôn ngữ",
