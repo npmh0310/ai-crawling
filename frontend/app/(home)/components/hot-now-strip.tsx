@@ -104,7 +104,7 @@ export function HotNowStrip({ onItemClick }: Props) {
 
   // ── JSX ────────────────────────────────────────────────────────────────────
   return (
-    <section className="border-b px-4 pt-4 pb-5 md:px-10 md:pt-6" aria-label={t("hotNow")}>
+    <section className="overflow-hidden border-b px-4 pt-4 pb-5 md:px-10 md:pt-6" aria-label={t("hotNow")}>
       <Carousel
         setApi={setApi}
         plugins={[autoplayRef.current]}
