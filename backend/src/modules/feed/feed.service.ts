@@ -136,7 +136,7 @@ export class FeedService {
     })
 
     const now = new Date()
-    const scored = candidates
+    const ranked = candidates
       .map((item) => ({
         item,
         score: computeHotScore({
@@ -149,13 +149,17 @@ export class FeedService {
           takeaways: item.takeaways,
         }, now),
       }))
-      .filter((x) => x.score.total >= HOT_THRESHOLD)
       .sort((a, b) => b.score.total - a.score.total)
-      .slice(0, limit)
 
-    return scored.map(({ item, score }) => ({
+    // Prefer items above the "hot" threshold; if too few qualify,
+    // fall back to top-N by score so the strip is never empty when fresh data exists.
+    const qualified = ranked.filter((x) => x.score.total >= HOT_THRESHOLD)
+    const finalList = qualified.length >= limit ? qualified.slice(0, limit) : ranked.slice(0, limit)
+
+    return finalList.map(({ item, score }) => ({
       ...this.toFeedResponse(item, lang),
       score: score.total,
+      isHot: score.total >= HOT_THRESHOLD,
     }))
   }
 
