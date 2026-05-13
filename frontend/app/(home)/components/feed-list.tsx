@@ -83,7 +83,7 @@ export function FeedList({
   if (items.length === 0) return <FeedListEmpty />
 
   return (
-    <div className="flex-1 overflow-y-auto border-t">
+    <div className="flex-1 overflow-x-hidden overflow-y-auto border-t">
       {items.map((item, i) => (
         <div
           key={item.id}
@@ -107,18 +107,20 @@ export function FeedList({
             />
           </div>
           <div className="min-w-0 flex-1">
-            <div className="mb-1 flex items-center justify-between gap-2">
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <div className="mb-1 flex flex-wrap items-center justify-between gap-x-2 gap-y-0.5">
+              <div className="flex min-w-0 flex-wrap items-center gap-x-2 text-xs text-muted-foreground">
                 <span className="font-semibold uppercase tracking-wide text-foreground">{item.company}</span>
                 <span>{item.category}</span>
                 <span>{item.timeAgo}</span>
               </div>
-              {item.handle && <span className="text-xs text-muted-foreground">{item.handle}</span>}
+              {item.handle && (
+                <span className="min-w-0 truncate text-xs text-muted-foreground">{item.handle}</span>
+              )}
             </div>
-            <p className={cn("mb-1 text-sm", item.isRead ? "font-normal" : "font-medium")}>{item.title}</p>
-            {item.body && <p className="text-sm text-muted-foreground">{item.body}</p>}
+            <p className={cn("mb-1 text-sm wrap-break-word", item.isRead ? "font-normal" : "font-medium")}>{item.title}</p>
+            {item.body && <p className="text-sm text-muted-foreground wrap-break-word">{item.body}</p>}
             {item.quote && (
-              <blockquote className="border-l-2 pl-3 text-sm italic text-muted-foreground">{item.quote}</blockquote>
+              <blockquote className="border-l-2 pl-3 text-sm italic text-muted-foreground wrap-break-word">{item.quote}</blockquote>
             )}
           </div>
         </div>

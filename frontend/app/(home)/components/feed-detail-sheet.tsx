@@ -93,10 +93,10 @@ export function FeedDetailSheet({ item, open, onOpenChange }: Props) {
                 <span className="text-xs text-muted-foreground">{item.timeAgo}</span>
               </div>
 
-              <h2 className="mb-3 text-xl font-bold leading-tight">{item.title}</h2>
+              <h2 className="mb-3 text-xl font-bold leading-tight wrap-break-word">{item.title}</h2>
 
               {(item.body || item.quote) && (
-                <p className="mb-5 text-sm leading-relaxed text-muted-foreground">
+                <p className="mb-5 text-sm leading-relaxed text-muted-foreground wrap-break-word">
                   {item.body ?? item.quote}
                 </p>
               )}
